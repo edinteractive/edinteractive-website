@@ -1,0 +1,7 @@
+# Old Squarespace / WordPress paths -> new sections. Extend once the old URL list is exported.
+/about      /#voices    301
+/contact    /#start     301
+/services   /#services  301
+/home       /           301
+/wp-admin   /           301
+/wp-login.php /         301
