@@ -223,4 +223,14 @@ $('hc-pdf').addEventListener('click', () => {
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 });
 
+// Prefill from the homepage form (?name=&email=&apps=CRM,Books&other=).
+const pre = new URLSearchParams(location.search);
+if (pre.get('name')) $('hc-name').value = pre.get('name').slice(0, 120);
+if (pre.get('email')) $('hc-email').value = pre.get('email').slice(0, 200);
+if (pre.get('other')) $('hc-apps-other').value = pre.get('other').slice(0, 160);
+for (const a of (pre.get('apps') || '').split(',')) {
+  const box = form.querySelector(`input[name=apps][value="${CSS.escape(a)}"]`);
+  if (box) box.checked = true;
+}
+
 show(0);

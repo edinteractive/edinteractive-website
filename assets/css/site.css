@@ -143,6 +143,7 @@ label{display:grid;gap:6px;font-size:14px;font-weight:500}
 [hidden]{display:none!important}
 input,select{font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-s);background:var(--paper);color:var(--ink);width:100%}
 .form-msg{font:500 13px var(--mono);color:var(--good)}
+.form-actions{display:flex;flex-wrap:wrap;gap:12px}.form-actions .btn{flex:1 1 auto;justify-content:center}
 
 footer{border-top:1px solid var(--line);padding-block:40px;color:var(--muted);font-size:14px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;align-items:center}
