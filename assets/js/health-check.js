@@ -183,7 +183,8 @@ async function finish() {
 
   const result = score(a);
   pdfBytes = buildPdf(a, result, new Date(), location.host);
-  pdfName = 'crm-health-check-' + (a.company || a.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.pdf';
+  const slug = (a.company || a.name).normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+  pdfName = slug ? 'crm-health-check-' + slug + '.pdf' : 'crm-health-check.pdf';
   renderResult(a, result);
 
   const sent = $('hc-sent');

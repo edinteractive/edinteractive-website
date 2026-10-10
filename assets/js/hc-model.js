@@ -138,12 +138,19 @@ export function score(a) {
   return { total, band: band(total), areas, fixes, priority, match: match(a) };
 }
 
-// Matches a practitioner from the pains picked, falling back to the role.
+// Matches a practitioner. Each pain picked is one vote; the "fix one thing" poll is a slightly
+// heavier vote, so it wins a tie with a single pain; the role breaks any remaining tie.
+// Without the poll vote, a sales lead who picked any pain could never get the Sales Workflow
+// Strategist, and only "Something else" could ever get the Data Specialist.
+const PRIORITY_MATCH = { data: 'data', pipeline: 'workflow', connected: 'analytics', automation: 'automation' };
 export function match(a) {
   const role = ROLES.find(r => r.id === a.role);
   const votes = {};
-  for (const id of a.pains) { const p = PAINS.find(x => x.id === id); votes[p.match] = (votes[p.match] || 0) + 1; }
-  votes[role.match] = (votes[role.match] || 0) + 0.5;
+  const vote = (k, n) => { votes[k] = (votes[k] || 0) + n; };
+  for (const id of a.pains) vote(PAINS.find(x => x.id === id).match, 1);
+  const pick = POLLS.find(p => p.id === 'priority').options[a.polls && a.polls.priority];
+  if (pick) vote(PRIORITY_MATCH[pick[1]], 1.1);
+  vote(role.match, 0.5);
   const best = Object.keys(votes).sort((x, y) => votes[y] - votes[x])[0];
   return { id: best, ...PRACTITIONERS[best] };
 }

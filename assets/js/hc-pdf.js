@@ -43,7 +43,15 @@ function wrap(str, size, bold, max) {
   const lines = [];
   for (const para of String(str).split('\n')) {
     let line = '';
-    for (const word of para.split(/\s+/).filter(Boolean)) {
+    for (let word of para.split(/\s+/).filter(Boolean)) {
+      // A word wider than the column (a URL, "Desk,Inventory,SalesIQ") is split so it can't run off the page.
+      while (width(word, size, bold) > max && word.length > 1) {
+        let n = word.length - 1;
+        while (n > 1 && width(word.slice(0, n), size, bold) > max) n--;
+        if (line) { lines.push(line); line = ''; }
+        lines.push(word.slice(0, n));
+        word = word.slice(n);
+      }
       const next = line ? line + ' ' + word : word;
       if (width(next, size, bold) <= max || !line) line = next;
       else { lines.push(line); line = word; }
@@ -86,14 +94,14 @@ export function buildPdf(a, r, date, site = 'edinteractivegroup.com') {
 
   // Who it's for.
   y -= 30; text(M, y, 'PREPARED FOR', 8.5, false, C.muted);
-  y -= 18; text(M, y, [a.name, a.company].filter(Boolean).join(', '), 14, true, C.ink);
+  y -= 4; para([a.name, a.company].filter(Boolean).join(', '), 14, true, C.ink, M, W - 2 * M, 1.3);
 
   // Score.
   y -= 62;
   text(M, y, String(r.total), 56, true, C.ink);
   const nx = M + width(String(r.total), 56, true) + 8;
   text(nx, y + 22, '/100', 13, false, C.muted);
-  text(nx, y + 4, r.band, 13, true, r.total >= 75 ? C.teal : C.deep);
+  text(nx, y + 4, r.band, 13, true, r.total >= 80 ? C.teal : C.deep);
 
   // Areas.
   heading('Score by area');

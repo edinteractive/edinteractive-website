@@ -119,9 +119,14 @@ async function smtp(env, envelopeTo, message) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if ((request.headers.get('Content-Length') || 0) > 20000) return json({ error: 'Too large.' }, 413);
+  // Content-Length can be missing (chunked uploads), so the size is checked on the body itself.
+  if (Number(request.headers.get('Content-Length') || 0) > 20000) return json({ error: 'Too large.' }, 413);
   let raw;
-  try { raw = await request.json(); } catch { return json({ error: 'Bad request.' }, 400); }
+  try {
+    const body = await request.text();
+    if (body.length > 20000) return json({ error: 'Too large.' }, 413);
+    raw = JSON.parse(body);
+  } catch { return json({ error: 'Bad request.' }, 400); }
   if (raw && raw.website) return json({ ok: true, emailed: false }); // honeypot: bots fill the hidden field
 
   const a = clean(raw);
