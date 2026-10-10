@@ -5,8 +5,16 @@
 //   SMTP_HOST  optional: smtppro.zoho.com (default, domain mailboxes), smtppro.zoho.ca for Canadian accounts
 //   NOTIFY_TO  optional: where new health checks are copied (defaults to SMTP_USER)
 // Without SMTP_USER and SMTP_PASS the visitor still gets the score and the PDF download; nothing is emailed.
+// Every health check also becomes a Lead in Zoho CRM through the Web-to-Lead form below (no keys needed).
 import { clean, validEmail, score, summary } from '../../assets/js/hc-model.js';
 import { buildPdf } from '../../assets/js/hc-pdf.js';
+
+// From the Zoho CRM Web-to-Lead form's embed code (Setup > Developer Hub > Webforms). These values are public.
+// Leave xnQsjsdp empty to skip the CRM step.
+const WEB_TO_LEAD = {
+  url: 'https://crm.zoho.com/crm/WebToLeadForm',
+  xnQsjsdp: '', xmIwtLD: '', actionType: 'TGVhZHM=', leadSource: 'Website - CRM health check'
+};
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
@@ -36,6 +44,25 @@ function mime({ from, to, replyTo, subject, html, pdf, pdfName }) {
     `Content-Disposition: attachment; filename="${pdfName}"`, '', lines76(base64(pdf)),
     `--${b}--`, ''
   ].filter(l => l !== null).join('\r\n');
+}
+
+// Posts the lead to Zoho CRM. Answers, score and fixes go in Description so they show on the Lead record.
+async function crmLead(a, r, emailed, site) {
+  if (!WEB_TO_LEAD.xnQsjsdp) return false;
+  const parts = a.name.trim().split(/\s+/);
+  const last = parts.length > 1 ? parts.pop() : parts[0];
+  const first = parts.length && last !== parts[0] ? parts.join(' ') : '';
+  const desc = [`CRM health check score: ${r.total}/100 (${r.band})`, `Match: ${r.match.title}`,
+    `Report emailed: ${emailed ? 'yes' : 'no'}`, '', 'Fix these first:', ...r.fixes.map((f, i) => `${i + 1}. ${f}`), '',
+    ...summary(a).map(([q, v]) => `${q}: ${v}`), ...(a.notes ? ['', 'Notes: ' + a.notes] : [])].join('\n');
+  const body = new URLSearchParams({
+    xnQsjsdp: WEB_TO_LEAD.xnQsjsdp, zc_gad: '', xmIwtLD: WEB_TO_LEAD.xmIwtLD, actionType: WEB_TO_LEAD.actionType,
+    returnURL: `https://${site}/health-check/`, 'First Name': first, 'Last Name': last, Email: a.email,
+    Company: a.company || a.name, Phone: a.phone, Description: desc.slice(0, 30000), 'Lead Source': WEB_TO_LEAD.leadSource
+  });
+  const res = await fetch(WEB_TO_LEAD.url, { method: 'POST', body, redirect: 'manual' });
+  if (res.status >= 400) throw new Error('Zoho CRM ' + res.status);
+  return true;
 }
 
 // Minimal SMTP client over Cloudflare's TCP sockets: implicit TLS on 465, STARTTLS otherwise.
@@ -98,7 +125,10 @@ export async function onRequestPost({ request, env }) {
   const r = score(a);
   const origin = new URL(request.url).origin;
   const pdf = buildPdf(a, r, new Date(), new URL(request.url).host);
-  if (!env.SMTP_USER || !env.SMTP_PASS) return json({ ok: true, emailed: false, score: r.total });
+  const site = new URL(request.url).host;
+  const lead = () => crmLead(a, r, emailed, site).catch(err => { console.error(err); return false; });
+  let emailed = false;
+  if (!env.SMTP_USER || !env.SMTP_PASS) return json({ ok: true, emailed, crm: await lead(), score: r.total });
 
   const from = addr(env.SMTP_USER, 'ED Interactive Group');
   const notify = env.NOTIFY_TO || env.SMTP_USER;
@@ -111,7 +141,6 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
 <p>Your full report is attached as a PDF. The next step is a free full audit: we check your real CRM and Books data through the API, read-only, and walk you through it in 30 minutes. <a href="${origin}/sample-report/">See a sample report</a>, then just reply to this email to book a time.</p>
 <p>ED Interactive Group<br>B2B different, better, smarter.</p>`;
 
-  let emailed = false;
   try {
     await smtp(env, [a.email], mime({
       from, to: addr(a.email, a.name), replyTo: addr(notify), subject: `Your CRM health check: ${r.total}/100`,
@@ -130,5 +159,6 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
     }));
   } catch (err) { console.error(err); }
 
-  return json({ ok: true, emailed, score: r.total });
+  const crm = await lead();
+  return json({ ok: true, emailed, crm, score: r.total });
 }
