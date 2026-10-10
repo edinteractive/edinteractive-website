@@ -163,7 +163,7 @@ async function finish() {
   next.disabled = true; next.textContent = 'Building your report…';
 
   const result = score(a);
-  pdfBytes = buildPdf(a, result, new Date());
+  pdfBytes = buildPdf(a, result, new Date(), location.host);
   pdfName = 'crm-health-check-' + (a.company || a.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.pdf';
   renderResult(a, result);
 

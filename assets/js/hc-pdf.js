@@ -54,7 +54,8 @@ function wrap(str, size, bold, max) {
 }
 const rgb = c => c.map(v => v.toFixed(3)).join(' ');
 
-export function buildPdf(a, r, date) {
+// site is the host shown in the report, e.g. edinteractive.digital.
+export function buildPdf(a, r, date, site = 'edinteractivegroup.com') {
   const pages = [];
   let ops, y;
 
@@ -139,7 +140,7 @@ export function buildPdf(a, r, date) {
   }
 
   // Next step.
-  const next = 'We check your real CRM and Books data through the API, read-only, and send a ranked fix list with the revenue each fix is worth. Reply to this email to book your free 30-minute walkthrough.';
+  const next = 'We check your real CRM and Books data through the API, read-only, and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute walkthrough, reply to our email.';
   const nl = wrap(next, 10.5, false, W - 2 * M - 36);
   const boxH = 46 + nl.length * 15;
   need(boxH + 30);
@@ -151,7 +152,7 @@ export function buildPdf(a, r, date) {
   // Footer on every page.
   pages.forEach((p, i) => {
     ops = p;
-    text(M, 28, 'ED Interactive Group  ·  B2B different, better, smarter.  ·  edinteractivegroup.com', 8, false, C.muted);
+    text(M, 28, 'ED Interactive Group  ·  B2B different, better, smarter.  ·  ' + site, 8, false, C.muted);
     right(W - M, 28, `Page ${i + 1} of ${pages.length}`, 8, false, C.muted);
   });
 

@@ -41,7 +41,8 @@ export async function onRequestPost({ request, env }) {
   if (!a.name || !validEmail(a.email)) return json({ error: 'Please add your name and a valid work email.' }, 422);
 
   const r = score(a);
-  const pdf = buildPdf(a, r, new Date());
+  const origin = new URL(request.url).origin;
+  const pdf = buildPdf(a, r, new Date(), new URL(request.url).host);
   if (!env.ZEPTOMAIL_TOKEN || !env.MAIL_FROM) return json({ ok: true, emailed: false, score: r.total });
 
   const from = { address: env.MAIL_FROM, name: 'ED Interactive Group' };
@@ -51,7 +52,7 @@ export async function onRequestPost({ request, env }) {
   const prospectHtml = `<p>Hi ${esc(first)},</p>
 <p>Thanks for taking the CRM health check. Your score is <b>${r.total}/100</b>: ${esc(r.band)}</p>
 ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
-<p>Your full report is attached as a PDF. The next step is a free full audit: we check your real CRM and Books data through the API, read-only, and walk you through it in 30 minutes. Just reply to this email to book a time.</p>
+<p>Your full report is attached as a PDF. The next step is a free full audit: we check your real CRM and Books data through the API, read-only, and walk you through it in 30 minutes. <a href="${origin}/sample-report/">See a sample report</a>, then just reply to this email to book a time.</p>
 <p>ED Interactive Group<br>B2B different, better, smarter.</p>`;
 
   let emailed = false;
