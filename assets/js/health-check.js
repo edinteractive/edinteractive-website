@@ -175,11 +175,12 @@ async function finish() {
     });
     const out = await res.json().catch(() => ({}));
     sent.textContent = out.emailed
-      ? 'Your PDF report is on its way to ' + a.email + '.'
-      : 'Download your PDF report below. We have your answers and will follow up by email.';
-    if (!res.ok && !out.emailed) sent.textContent = 'Download your PDF report below. We could not send it by email just now.';
+      ? 'Great, thank you! Your PDF report is on its way to ' + a.email + '.'
+      : 'Thank you. Download your PDF report below. We have your answers and will follow up by email.';
+    if (location.hostname.endsWith('.pages.dev') && out.crm) $('hc-sent').textContent += ' [test: ' + out.crm + ']'; // previews only
+    if (!res.ok && !out.emailed) sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
   } catch {
-    sent.textContent = 'Download your PDF report below. We could not send it by email just now.';
+    sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
   }
 }
 
