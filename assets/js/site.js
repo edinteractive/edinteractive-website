@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!otherWrap.hidden) document.getElementById('hc-other').focus();
     });
   }
-  var appsFor = { 'CRM only': 'CRM', 'CRM + Books': 'CRM,Books', 'CRM + Creator + Books': 'CRM,Creator,Books', 'Zoho One': 'Zoho One' };
+  var appsFor = { 'Not on Zoho yet': 'Not on Zoho yet', 'CRM only': 'CRM', 'CRM + Books': 'CRM,Books', 'CRM + Creator + Books': 'CRM,Creator,Books', 'Zoho One': 'Zoho One' };
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var q = new URLSearchParams();

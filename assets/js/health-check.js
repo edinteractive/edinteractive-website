@@ -1,6 +1,6 @@
 // CRM health check: five short steps, an instant score on screen, and a PDF report.
 // The report function (/api/health-check) emails the same PDF and records the lead.
-import { ROLES, PAINS, MAX_PAINS, APPS, CRM_USERS, STATEMENTS, LIKERT_SCALE, POLLS, clean, validEmail, score, match } from './hc-model.js';
+import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, LIKERT_SCALE, POLLS, clean, validEmail, score, match } from './hc-model.js';
 import { buildPdf } from './hc-pdf.js';
 
 const $ = id => document.getElementById(id);
@@ -45,11 +45,29 @@ $('hc-pains').addEventListener('change', e => {
   const on = form.querySelectorAll('input[name=pains]:checked');
   if (on.length > MAX_PAINS) { e.target.checked = false; flash($('hc-pain-hint')); }
 });
-for (const a of APPS) {
-  const [lab] = choice('checkbox', 'apps', a, 'hc-chip');
-  lab.appendChild(el('span', null, a));
-  $('hc-apps').appendChild(lab);
+function chip(box, name, value) {
+  const [lab, input] = choice('checkbox', name, value, 'hc-chip');
+  lab.appendChild(el('span', null, value));
+  $(box).appendChild(lab);
+  return input;
 }
+const notZoho = chip('hc-nozoho', 'apps', NOT_ZOHO);
+for (const a of APPS) chip('hc-apps', 'apps', a);
+for (const c of OTHER_CRMS) chip('hc-crms', 'crms', c);
+// "Not on Zoho yet" switches off the Zoho apps and asks what they use instead.
+function syncZoho() {
+  const off = notZoho.checked;
+  for (const box of $('hc-apps').querySelectorAll('input')) { box.disabled = off; if (off) box.checked = false; }
+  $('hc-apps').classList.toggle('hc-off', off);
+  $('hc-apps-other').disabled = off;
+  if (off) $('hc-apps-other').value = '';
+  $('hc-crm-wrap').hidden = !off;
+  if (!off) {
+    for (const box of $('hc-crms').querySelectorAll('input')) box.checked = false;
+    $('hc-crm-other').value = '';
+  }
+}
+notZoho.addEventListener('change', syncZoho);
 const users = $('hc-users');
 users.appendChild(new Option('Choose one', ''));
 for (const u of CRM_USERS) users.appendChild(new Option(u, u));
@@ -97,6 +115,7 @@ function answers() {
   for (const p of POLLS) { const v = picked('poll-' + p.id)[0]; polls[p.id] = v == null ? NaN : Number(v); }
   return {
     role: picked('role')[0], pains: picked('pains'), apps: picked('apps'), appsOther: $('hc-apps-other').value,
+    crms: picked('crms'), crmOther: $('hc-crm-other').value,
     users: users.value, likert, polls,
     name: $('hc-name').value, email: $('hc-email').value, company: $('hc-company').value,
     phone: $('hc-phone').value, notes: $('hc-notes').value, website: $('hc-website').value
@@ -233,5 +252,6 @@ for (const a of (pre.get('apps') || '').split(',')) {
   const box = form.querySelector(`input[name=apps][value="${CSS.escape(a)}"]`);
   if (box) box.checked = true;
 }
+syncZoho();
 
 show(0);
