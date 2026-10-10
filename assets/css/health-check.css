@@ -94,3 +94,4 @@ a.hc-chip:hover{border-color:var(--ink)}
 .bar i.low{background:var(--warn)}
 @media (max-width:560px){.hc-roles{grid-template-columns:1fr}.hc-dot::before{width:26px;height:26px}.hc-dot:nth-child(1)::before,.hc-dot:nth-child(5)::before{width:30px;height:30px}}
 @media (prefers-reduced-motion:reduce){.hc-dot::before{transition:none}.hc-flash{animation:none}}
+.hc-ts{margin:12px 0 4px}.hc-ts:empty{display:none}

@@ -1,7 +1,7 @@
 // Builds the CRM health check report as a PDF (Uint8Array) with no dependencies,
 // so the same code runs in the browser (download) and in the Pages Function (email).
 // Uses the built-in Helvetica fonts, which only cover Latin-1 text.
-import { summary } from './hc-model.js';
+import { summary, isNotZoho } from './hc-model.js';
 
 const W = 612, H = 792, M = 48; // US Letter, 48pt margins
 const C = {
@@ -148,7 +148,7 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   }
 
   // Next step.
-  const next = 'We check your real CRM and Books data through the API, read-only, and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute walkthrough, reply to our email.';
+  const next = (isNotZoho(a) ? 'We review an export of your current CRM and accounting data, map what moving to Zoho would fix,' : 'We check your real CRM and Books data through the API, read-only,') + ' and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute walkthrough, reply to our email.';
   const nl = wrap(next, 10.5, false, W - 2 * M - 36);
   const boxH = 46 + nl.length * 15;
   need(boxH + 30);

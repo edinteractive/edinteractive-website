@@ -1,6 +1,6 @@
 // CRM health check: five short steps, an instant score on screen, and a PDF report.
 // The report function (/api/health-check) emails the same PDF and records the lead.
-import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, LIKERT_SCALE, POLLS, clean, validEmail, score, match } from './hc-model.js';
+import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, LIKERT_SCALE, POLLS, clean, validEmail, score, match, worded, auditLine } from './hc-model.js';
 import { buildPdf } from './hc-pdf.js';
 
 const $ = id => document.getElementById(id);
@@ -11,6 +11,22 @@ const warn = $('hc-warn');
 let at = 0;
 let pdfBytes = null;
 let pdfName = 'crm-health-check.pdf';
+
+// Cloudflare Turnstile bot check, loaded only when the contact step opens.
+const siteKey = (document.querySelector('meta[name=turnstile-sitekey]') || {}).content || '';
+let tsWidget = null;
+function loadTurnstile() {
+  if (!siteKey || tsWidget !== null || document.getElementById('hc-ts-js')) return;
+  window.hcTurnstileReady = () => {
+    tsWidget = window.turnstile.render('#hc-ts', { sitekey: siteKey, action: 'health-check', size: 'flexible' });
+  };
+  const js = document.createElement('script');
+  js.id = 'hc-ts-js';
+  js.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=hcTurnstileReady';
+  js.async = true;
+  document.head.appendChild(js);
+}
+const tsToken = () => (siteKey && window.turnstile && tsWidget !== null ? window.turnstile.getResponse(tsWidget) : '') || '';
 
 function el(tag, cls, text) {
   const n = document.createElement(tag);
@@ -38,7 +54,8 @@ for (const r of ROLES) {
 // Step 2: pain chips (max three), app chips, team size.
 for (const p of PAINS) {
   const [lab] = choice('checkbox', 'pains', p.id, 'hc-chip');
-  lab.appendChild(el('span', null, p.label));
+  lab.appendChild(el('span', 'hc-pain-t', p.label));
+  lab.dataset.id = p.id;
   $('hc-pains').appendChild(lab);
 }
 $('hc-pains').addEventListener('change', e => {
@@ -62,6 +79,9 @@ function syncZoho() {
   $('hc-apps-other').disabled = off;
   if (off) $('hc-apps-other').value = '';
   $('hc-crm-wrap').hidden = !off;
+  // Visitors not on Zoho see the same questions worded for the CRM and accounting they use today.
+  for (const lab of $('hc-pains').children) lab.querySelector('.hc-pain-t').textContent = worded('pains', PAINS.find(p => p.id === lab.dataset.id), off).label;
+  for (const s of STATEMENTS) $('hc-st-' + s.id).textContent = worded('statements', s, off).text;
   if (!off) {
     for (const box of $('hc-crms').querySelectorAll('input')) box.checked = false;
     $('hc-crm-other').value = '';
@@ -77,7 +97,7 @@ STATEMENTS.forEach((s, i) => {
   const fs = el('fieldset', 'hc-scale');
   const lg = el('legend');
   lg.appendChild(el('span', 'hc-n', String(i + 1).padStart(2, '0')));
-  lg.appendChild(document.createTextNode(s.text));
+  lg.appendChild(el('span', null, s.text)).id = 'hc-st-' + s.id;
   fs.appendChild(lg);
   const row = el('div', 'hc-dots');
   LIKERT_SCALE.forEach((word, v) => {
@@ -148,6 +168,7 @@ function show(step) {
   $('hc-next').textContent = step === steps.length - 1 ? 'Request my health check' : 'Continue →';
   $('hc-fine').hidden = step !== steps.length - 1;
   warn.hidden = true;
+  if (step === 4) loadTurnstile();
   if (step === 4) renderMatch($('hc-match'), match(clean(answers())));
 }
 
@@ -158,7 +179,7 @@ function renderMatch(box, m) {
   const ul = el('ul', 'checks');
   for (const s of m.skills) ul.appendChild(el('li', null, s));
   box.appendChild(ul);
-  const pains = picked('pains').map(id => PAINS.find(p => p.id === id).label);
+  const pains = picked('pains').map(id => worded('pains', PAINS.find(p => p.id === id), notZoho.checked).label);
   if (pains.length) box.appendChild(el('p', 'hc-focus', 'Health check focus: ' + pains.join(', ')));
 }
 
@@ -178,6 +199,8 @@ async function finish() {
   const raw = answers();
   const a = clean(raw);
   if (a.error) { warn.textContent = a.error; warn.hidden = false; return; }
+  raw.turnstile = tsToken();
+  if (siteKey && !raw.turnstile) { warn.textContent = 'One moment: the security check is still running. Try again in a few seconds.'; warn.hidden = false; return; }
   const next = $('hc-next');
   next.disabled = true; next.textContent = 'Building your report…';
 
@@ -198,7 +221,8 @@ async function finish() {
       ? 'Great, thank you! Your PDF report is on its way to ' + a.email + '.'
       : 'Thank you. Download your PDF report below. We have your answers and will follow up by email.';
     if (location.hostname.endsWith('.pages.dev') && out.crm) $('hc-sent').textContent += ' [test: ' + out.crm + ']'; // previews only
-    if (!res.ok && !out.emailed) sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
+    if (res.status === 403) sent.textContent = 'Download your PDF report below. We could not verify the request, so it was not sent or saved. Please reload and try again.';
+    else if (!res.ok && !out.emailed) sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
   } catch {
     sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
   }
@@ -224,6 +248,7 @@ function renderResult(a, r) {
   for (const f of r.fixes) list.appendChild(el('li', null, f));
   if (!r.fixes.length) list.appendChild(el('li', null, 'Nothing urgent. The full audit will confirm it against your real data.'));
   renderMatch($('hc-match-2'), r.match);
+  $('hc-foot').textContent = 'Based on your answers only. ' + auditLine(a);
   const q = a.company ? '?company=' + encodeURIComponent(a.company.slice(0, 60)) : '';
   $('hc-s-fab').href = '/sample-report/' + q;
   $('hc-s-train').href = '/sample-report/training/' + q;

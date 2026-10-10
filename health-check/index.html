@@ -6,6 +6,8 @@
 <title>Free Zoho CRM health check | ED Interactive Group</title>
 <meta name="description" content="Answer a few quick questions about your Zoho CRM and get an instant health score, the fixes that matter most, and a PDF report by email.">
 <link rel="canonical" href="https://edinteractive.digital/health-check/">
+<!-- Cloudflare Turnstile site key (public). Empty = no bot check and no report email; see functions/api/health-check.js. -->
+<meta name="turnstile-sitekey" content="">
 <meta name="theme-color" content="#141518">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -90,6 +92,7 @@
         <label><span>Anything we should know? <span class="hc-opt">(optional)</span></span>
           <textarea id="hc-notes" rows="3" maxlength="1500" placeholder="e.g. we migrated from Salesforce last year"></textarea>
         </label>
+        <div id="hc-ts" class="hc-ts"></div>
         <div class="hc-hp" aria-hidden="true"><label>Website<input id="hc-website" type="text" tabindex="-1" autocomplete="off"></label></div>
       </section>
 
@@ -108,7 +111,7 @@
         <div class="rows" id="hc-areas"></div>
         <h2 class="hc-fixes-h">Fix these first</h2>
         <ol class="hc-fixes" id="hc-fixes"></ol>
-        <p class="panel-foot">Based on your answers only. The full audit checks your real CRM and Books data through the API, read-only.</p>
+        <p class="panel-foot" id="hc-foot">Based on your answers only. The full audit checks your real CRM and Books data through the API, read-only.</p>
       </div>
       <div class="hc-after">
         <p class="eyebrow">Your match</p>
