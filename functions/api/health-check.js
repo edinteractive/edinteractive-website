@@ -63,8 +63,12 @@ async function crmLead(a, r, emailed, site) {
     aG9uZXlwb3Q: '' // Zoho's own honeypot, must be empty
   });
   const res = await fetch(WEB_TO_LEAD.url, { method: 'POST', body, redirect: 'manual' });
-  if (res.status >= 400) throw new Error('Zoho CRM ' + res.status);
-  return true;
+  const where = res.headers.get('Location') || '';
+  const text = (await res.text()).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const detail = `Zoho CRM ${res.status} ${where} ${text}`.slice(0, 300);
+  console.log(detail);
+  if (res.status >= 400) throw new Error(detail);
+  return detail;
 }
 
 // Minimal SMTP client over Cloudflare's TCP sockets: implicit TLS on 465, STARTTLS otherwise.
@@ -128,7 +132,7 @@ export async function onRequestPost({ request, env }) {
   const origin = new URL(request.url).origin;
   const pdf = buildPdf(a, r, new Date(), new URL(request.url).host);
   const site = new URL(request.url).host;
-  const lead = () => crmLead(a, r, emailed, site).catch(err => { console.error(err); return false; });
+  const lead = () => crmLead(a, r, emailed, site).catch(err => { console.error(err); return 'error: ' + String(err.message || err).slice(0, 300); });
   let emailed = false;
   if (!env.SMTP_USER || !env.SMTP_PASS) return json({ ok: true, emailed, crm: await lead(), score: r.total });
 

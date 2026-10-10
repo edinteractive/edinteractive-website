@@ -177,6 +177,7 @@ async function finish() {
     sent.textContent = out.emailed
       ? 'Thank you. Your PDF report is on its way to ' + a.email + '.'
       : 'Thank you. Download your PDF report below. We have your answers and will follow up by email.';
+    if (location.hostname.endsWith('.pages.dev') && out.crm) $('hc-sent').textContent += ' [test: ' + out.crm + ']'; // previews only
     if (!res.ok && !out.emailed) sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
   } catch {
     sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
