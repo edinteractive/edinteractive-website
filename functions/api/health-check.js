@@ -10,10 +10,11 @@ import { clean, validEmail, score, summary } from '../../assets/js/hc-model.js';
 import { buildPdf } from '../../assets/js/hc-pdf.js';
 
 // From the Zoho CRM Web-to-Lead form's embed code (Setup > Developer Hub > Webforms). These values are public.
-// Leave xnQsjsdp empty to skip the CRM step.
+// Form: "Zoho Health Checkup" (US data centre). Leave xnQsjsdp empty to skip the CRM step.
 const WEB_TO_LEAD = {
   url: 'https://crm.zoho.com/crm/WebToLeadForm',
-  xnQsjsdp: '', xmIwtLD: '', actionType: 'TGVhZHM=', leadSource: 'Website - CRM health check'
+  xnQsjsdp: '62bd2a3d68e0021f184f3c225b99346663884849d4ef2b4f25ccde71bda07148',
+  xmIwtLD: '9e90b8692907b49ef0159284da9ae6ea3cec2e0582b1d0611e7a26852b786837dd154a51637adfa23a299e8ce4e573e5', actionType: 'TGVhZHM=', leadSource: 'Website - CRM health check'
 };
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
@@ -51,14 +52,15 @@ async function crmLead(a, r, emailed, site) {
   if (!WEB_TO_LEAD.xnQsjsdp) return false;
   const parts = a.name.trim().split(/\s+/);
   const last = parts.length > 1 ? parts.pop() : parts[0];
-  const first = parts.length && last !== parts[0] ? parts.join(' ') : '';
+  const first = parts.length && last !== parts[0] ? parts.join(' ') : last; // the form requires both names
   const desc = [`CRM health check score: ${r.total}/100 (${r.band})`, `Match: ${r.match.title}`,
     `Report emailed: ${emailed ? 'yes' : 'no'}`, '', 'Fix these first:', ...r.fixes.map((f, i) => `${i + 1}. ${f}`), '',
     ...summary(a).map(([q, v]) => `${q}: ${v}`), ...(a.notes ? ['', 'Notes: ' + a.notes] : [])].join('\n');
   const body = new URLSearchParams({
     xnQsjsdp: WEB_TO_LEAD.xnQsjsdp, zc_gad: '', xmIwtLD: WEB_TO_LEAD.xmIwtLD, actionType: WEB_TO_LEAD.actionType,
     returnURL: `https://${site}/health-check/`, 'First Name': first, 'Last Name': last, Email: a.email,
-    Company: a.company || a.name, Phone: a.phone, Description: desc.slice(0, 30000), 'Lead Source': WEB_TO_LEAD.leadSource
+    Company: a.company || a.name, Phone: a.phone, Description: desc.slice(0, 30000), 'Lead Source': WEB_TO_LEAD.leadSource,
+    aG9uZXlwb3Q: '' // Zoho's own honeypot, must be empty
   });
   const res = await fetch(WEB_TO_LEAD.url, { method: 'POST', body, redirect: 'manual' });
   if (res.status >= 400) throw new Error('Zoho CRM ' + res.status);
