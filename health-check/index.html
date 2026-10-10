@@ -52,9 +52,16 @@
         <p class="hc-sub" id="hc-pain-hint">Pick up to three.</p>
         <div class="hc-chips" id="hc-pains" role="group" aria-labelledby="hc-h1"></div>
         <p class="hc-label" id="hc-apps-l">Zoho apps you use</p>
+        <div class="hc-chips" id="hc-nozoho" role="group" aria-labelledby="hc-apps-l"></div>
         <div class="hc-chips" id="hc-apps" role="group" aria-labelledby="hc-apps-l"></div>
         <label class="hc-sr" for="hc-apps-other">Other Zoho apps</label>
         <input id="hc-apps-other" type="text" placeholder="Others, e.g. Desk, Inventory, SalesIQ" maxlength="160">
+        <div class="hc-crm-wrap" id="hc-crm-wrap" hidden>
+          <p class="hc-label" id="hc-crms-l">What do you use for customers and deals today?</p>
+          <div class="hc-chips" id="hc-crms" role="group" aria-labelledby="hc-crms-l"></div>
+          <label class="hc-sr" for="hc-crm-other">Something else</label>
+          <input id="hc-crm-other" type="text" placeholder="Something else? Tell us which" maxlength="160">
+        </div>
         <label>How many people use your CRM?
           <select id="hc-users"></select>
         </label>
