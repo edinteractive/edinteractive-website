@@ -134,7 +134,11 @@ export async function onRequestPost({ request, env }) {
   const site = new URL(request.url).host;
   const lead = () => crmLead(a, r, emailed, site).catch(err => { console.error(err); return 'error: ' + String(err.message || err).slice(0, 300); });
   let emailed = false;
-  if (!env.SMTP_USER || !env.SMTP_PASS) return json({ ok: true, emailed, crm: await lead(), score: r.total });
+  const preview = site.endsWith('.pages.dev'); // Zoho's raw reply is shown on preview sites only
+  if (!env.SMTP_USER || !env.SMTP_PASS) {
+    const crm = await lead();
+    return json({ ok: true, emailed, crm: preview ? crm : undefined, score: r.total });
+  }
 
   const from = addr(env.SMTP_USER, 'ED Interactive Group');
   const notify = env.NOTIFY_TO || env.SMTP_USER;
@@ -155,8 +159,9 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
     emailed = true;
   } catch (err) { console.error(err); }
 
+  const crm = await lead();
   const rows = [['Name', a.name], ['Email', a.email], ['Company', a.company], ['Phone', a.phone], ['Notes', a.notes],
-    ['Score', `${r.total}/100 (${r.band})`], ['Match', r.match.title], ['Report emailed', emailed ? 'Yes' : 'No'], ...summary(a)]
+    ['Score', `${r.total}/100 (${r.band})`], ['Match', r.match.title], ['Report emailed', emailed ? 'Yes' : 'No'], ['Zoho CRM', crm || 'not sent'], ...summary(a)]
     .filter(([, v]) => v).map(([k, v]) => `<tr><td>${esc(k)}</td><td><b>${esc(v)}</b></td></tr>`).join('');
   try {
     await smtp(env, [notify], mime({
@@ -165,6 +170,5 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
     }));
   } catch (err) { console.error(err); }
 
-  const crm = await lead();
-  return json({ ok: true, emailed, crm, score: r.total });
+  return json({ ok: true, emailed, crm: preview ? crm : undefined, score: r.total });
 }
