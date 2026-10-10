@@ -1,0 +1,20 @@
+/* Health check page. Reuses site.css tokens; only quiz-specific layout here. */
+.hc-intro{padding-block:56px 24px;max-width:860px}
+.hc-intro h1{font-size:clamp(36px,5vw,64px);line-height:1.02;margin-block:14px 16px}
+.hc-intro .lede{color:var(--muted);max-width:60ch}
+.hc-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:start;padding-bottom:64px}
+.hc-quiz{gap:22px}
+.hc-quiz fieldset{border:0;border-bottom:1px solid var(--line);margin:0;padding:0 0 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.hc-quiz legend{font:600 17px/1.35 var(--display);margin-bottom:12px;padding:0;display:flex;gap:12px}
+.hc-n{font:500 12px/1.9 var(--mono);color:var(--muted)}
+.hc-quiz label{display:flex;align-items:center;gap:10px;font-weight:400;font-size:15px;border:1px solid var(--line);border-radius:var(--radius-s);padding:10px 12px;cursor:pointer;background:var(--paper)}
+.hc-quiz label:has(input:checked){border-color:var(--ink);background:var(--signal-soft)}
+.hc-quiz input[type=radio]{width:auto;margin:0;accent-color:var(--ink)}
+.hc-progress{font:500 13px var(--mono);color:var(--muted)}
+.hc-warn{color:var(--warn)}
+.hc-result{position:sticky;top:88px}
+.hc-fixes-h{font-size:18px;margin-top:22px}
+.hc-fixes{margin:10px 0 0;padding-left:20px;display:grid;gap:8px;font-size:14px}
+.bar i.mid{background:var(--gold)}
+.bar i.low{background:var(--warn)}
+@media (max-width:860px){.hc-layout{grid-template-columns:1fr}.hc-result{position:static}.hc-quiz fieldset{grid-template-columns:1fr}}
