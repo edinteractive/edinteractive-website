@@ -19,7 +19,10 @@ export const PAINS = [
 ];
 export const MAX_PAINS = 3;
 
-export const APPS = ['CRM', 'Books', 'Creator', 'Analytics', 'Campaigns', 'Zoho One', 'Not on Zoho yet'];
+export const APPS = ['CRM', 'Books', 'Creator', 'Analytics', 'Campaigns', 'Zoho One'];
+export const NOT_ZOHO = 'Not on Zoho yet';
+// What non-Zoho visitors use today: spreadsheets plus Zoho CRM's main competitors.
+export const OTHER_CRMS = ['Excel or Google Sheets', 'Salesforce', 'HubSpot', 'Microsoft Dynamics 365', 'Pipedrive', 'monday CRM', 'Freshsales', 'Zendesk Sell', 'Keap', 'No CRM yet'];
 export const CRM_USERS = ['1–5', '6–15', '16–50', '51+'];
 
 export const AREAS = {
@@ -82,7 +85,10 @@ export function clean(raw) {
   const role = ROLES.find(r => r.id === raw.role);
   if (!role) return { error: 'Pick the option that sounds most like you.' };
   const pains = (Array.isArray(raw.pains) ? raw.pains : []).filter(id => PAINS.some(p => p.id === id)).slice(0, MAX_PAINS);
-  const apps = (Array.isArray(raw.apps) ? raw.apps : []).filter(a => APPS.includes(a));
+  const notZoho = Array.isArray(raw.apps) && raw.apps.includes(NOT_ZOHO);
+  // "Not on Zoho yet" rules out Zoho apps; the CRM they use instead is asked only then.
+  const apps = notZoho ? [NOT_ZOHO] : (Array.isArray(raw.apps) ? raw.apps : []).filter(a => APPS.includes(a));
+  const crms = notZoho ? (Array.isArray(raw.crms) ? raw.crms : []).filter(c => OTHER_CRMS.includes(c)) : [];
   const users = CRM_USERS.includes(raw.users) ? raw.users : '';
   const likert = {};
   for (const s of STATEMENTS) {
@@ -100,7 +106,8 @@ export function clean(raw) {
     name: clip(raw.name, LIMIT.name), email: clip(raw.email, LIMIT.email).toLowerCase(),
     company: clip(raw.company, LIMIT.company), phone: clip(raw.phone, LIMIT.phone), notes: clip(raw.notes, LIMIT.notes)
   };
-  return { role: role.id, pains, apps, appsOther: clip(raw.appsOther, LIMIT.other), users, likert, polls, ...contact };
+  return { role: role.id, pains, apps, appsOther: notZoho ? '' : clip(raw.appsOther, LIMIT.other),
+    crms, crmOther: notZoho ? clip(raw.crmOther, LIMIT.other) : '', users, likert, polls, ...contact };
 }
 
 export function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e); }
@@ -148,6 +155,7 @@ export function summary(a) {
     ['Role', role.title],
     ['Manual work piles up in', a.pains.map(id => PAINS.find(p => p.id === id).label).join(', ') || 'Not given'],
     ['Zoho apps', [...a.apps, a.appsOther].filter(Boolean).join(', ') || 'Not given'],
+    ...(a.apps.includes(NOT_ZOHO) ? [['Uses today instead', [...a.crms, a.crmOther].filter(Boolean).join(', ') || 'Not given']] : []),
     ['People using the CRM', a.users || 'Not given']
   ];
   for (const p of POLLS) rows.push([p.q, p.options[a.polls[p.id]][0]]);
