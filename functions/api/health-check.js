@@ -98,8 +98,7 @@ export async function onRequestPost({ request, env }) {
   const r = score(a);
   const origin = new URL(request.url).origin;
   const pdf = buildPdf(a, r, new Date(), new URL(request.url).host);
-  const missing = ['SMTP_USER', 'SMTP_PASS'].filter(k => !env[k]);
-  if (missing.length) return json({ ok: true, emailed: false, mail: 'missing ' + missing.join(' and '), score: r.total });
+  if (!env.SMTP_USER || !env.SMTP_PASS) return json({ ok: true, emailed: false, score: r.total });
 
   const from = addr(env.SMTP_USER, 'ED Interactive Group');
   const notify = env.NOTIFY_TO || env.SMTP_USER;
@@ -112,14 +111,14 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
 <p>Your full report is attached as a PDF. The next step is a free full audit: we check your real CRM and Books data through the API, read-only, and walk you through it in 30 minutes. <a href="${origin}/sample-report/">See a sample report</a>, then just reply to this email to book a time.</p>
 <p>ED Interactive Group<br>B2B different, better, smarter.</p>`;
 
-  let emailed = false, mailError = '';
+  let emailed = false;
   try {
     await smtp(env, [a.email], mime({
       from, to: addr(a.email, a.name), replyTo: addr(notify), subject: `Your CRM health check: ${r.total}/100`,
       html: prospectHtml, pdf, pdfName
     }));
     emailed = true;
-  } catch (err) { console.error(err); mailError = String(err.message || err).slice(0, 160); }
+  } catch (err) { console.error(err); }
 
   const rows = [['Name', a.name], ['Email', a.email], ['Company', a.company], ['Phone', a.phone], ['Notes', a.notes],
     ['Score', `${r.total}/100 (${r.band})`], ['Match', r.match.title], ['Report emailed', emailed ? 'Yes' : 'No'], ...summary(a)]
@@ -131,5 +130,5 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
     }));
   } catch (err) { console.error(err); }
 
-  return json({ ok: true, emailed, mail: mailError || 'sent', score: r.total });
+  return json({ ok: true, emailed, score: r.total });
 }
