@@ -178,6 +178,7 @@ async function finish() {
       ? 'Your PDF report is on its way to ' + a.email + '.'
       : 'Download your PDF report below. We have your answers and will follow up by email.';
     if (!res.ok && !out.emailed) sent.textContent = 'Download your PDF report below. We could not send it by email just now.';
+    if (!out.emailed && out.mail) $('hc-diag').textContent = 'Email status: ' + out.mail; // temporary, while email is being set up
   } catch {
     sent.textContent = 'Download your PDF report below. We could not send it by email just now.';
   }
