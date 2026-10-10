@@ -1,5 +1,7 @@
 # edinteractivegroup.com
 
+> Live on **edinteractive.digital** first. Canonicals, og tags, `sitemap.xml` and `robots.txt` use edinteractive.digital until the edinteractivegroup.com cutover; at cutover, find-and-replace the domain in those files (and the `sameAs` in the homepage JSON-LD), plus add a 301 from edinteractive.digital.
+
 Static site for ED Interactive Group, hosted on Cloudflare Pages.
 
 - No build step. Cloudflare Pages: build command empty, output directory `/`.

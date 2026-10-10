@@ -63,7 +63,7 @@ function wrap(str, size, bold, max) {
 const rgb = c => c.map(v => v.toFixed(3)).join(' ');
 
 // site is the host shown in the report, e.g. edinteractive.digital.
-export function buildPdf(a, r, date, site = 'edinteractivegroup.com') {
+export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   const pages = [];
   let ops, y;
 
@@ -179,7 +179,7 @@ function assemble(streams) {
     objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${6 + i * 2} 0 R >>`);
     objs.push(`<< /Length ${s.length} >>\nstream\n${s}\nendstream`);
   });
-  objs.push('<< /Title (CRM health check report) /Author (ED Interactive Group) /Producer (edinteractivegroup.com) >>');
+  objs.push('<< /Title (CRM health check report) /Author (ED Interactive Group) /Producer (edinteractive.digital) >>');
   let out = '%PDF-1.4\n%âãÏÓ\n';
   const offsets = [];
   objs.forEach((o, i) => { offsets.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
