@@ -15,6 +15,7 @@
 <link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/report.css">
+<script src="/assets/js/report.js" defer></script>
 </head>
 <body>
 <header>
@@ -25,8 +26,15 @@
 </header>
 
 <div class="r-banner">
-  <div class="wrap"><b>Sample report.</b> The company and figures below are illustrative. Your audit uses your own Zoho data.</div>
+  <div class="wrap"><b>Sample report.</b> <span data-banner>The company and figures below are illustrative. Your audit uses your own Zoho data.</span></div>
 </div>
+
+<nav class="r-switch" aria-label="Choose an industry">
+  <div class="wrap"><span class="eyebrow">See a sample for</span>
+    <a href="/sample-report/" data-ind="fab" aria-current="page">Fabrication</a>
+    <a href="/sample-report/training/" data-ind="training">Training and L&amp;D</a>
+  </div>
+</nav>
 
 <main>
   <div class="wrap">
@@ -34,10 +42,10 @@
     <div class="r-head">
       <div>
         <p class="eyebrow">Free full audit · Zoho CRM + Books</p>
-        <h1>Northfield Fabrication: CRM audit and ranked fix list</h1>
+        <h1><span data-company>Northfield Fabrication</span>: CRM audit and ranked fix list</h1>
       </div>
       <dl class="r-meta">
-        <dt>Prepared for</dt><dd>Northfield Fabrication Inc. (sample)</dd>
+        <dt>Prepared for</dt><dd><span data-company-full>Northfield Fabrication Inc.</span> (sample)</dd>
         <dt>Data read</dt><dd>Zoho CRM and Zoho Books, read-only</dd>
         <dt>Period</dt><dd>Last 24 months</dd>
         <dt>Prepared by</dt><dd>ED Interactive Group</dd>

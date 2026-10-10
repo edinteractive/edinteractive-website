@@ -203,6 +203,9 @@ function renderResult(a, r) {
   for (const f of r.fixes) list.appendChild(el('li', null, f));
   if (!r.fixes.length) list.appendChild(el('li', null, 'Nothing urgent. The full audit will confirm it against your real data.'));
   renderMatch($('hc-match-2'), r.match);
+  const q = a.company ? '?company=' + encodeURIComponent(a.company.slice(0, 60)) : '';
+  $('hc-s-fab').href = '/sample-report/' + q;
+  $('hc-s-train').href = '/sample-report/training/' + q;
 
   form.hidden = true;
   const box = $('hc-result');
