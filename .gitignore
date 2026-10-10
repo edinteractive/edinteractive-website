@@ -2,3 +2,4 @@
 node_modules/
 .lighthouseci/
 .wrangler/
+.dev.vars
