@@ -1,20 +1,91 @@
-/* Health check page. Reuses site.css tokens; only quiz-specific layout here. */
+/* Health check page. Reuses site.css tokens; only the step flow and results here. */
 .hc-intro{padding-block:56px 24px;max-width:860px}
 .hc-intro h1{font-size:clamp(36px,5vw,64px);line-height:1.02;margin-block:14px 16px}
 .hc-intro .lede{color:var(--muted);max-width:60ch}
-.hc-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:start;padding-bottom:64px}
-.hc-quiz{gap:22px}
-.hc-quiz fieldset{border:0;border-bottom:1px solid var(--line);margin:0;padding:0 0 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.hc-quiz legend{font:600 17px/1.35 var(--display);margin-bottom:12px;padding:0;display:flex;gap:12px}
+.hc-stage{padding-bottom:72px}
+.hc-card,.hc-result{max-width:720px;scroll-margin-top:84px}
+.hc-card{gap:18px;padding:clamp(20px,4vw,32px)}
+.hc-card h2,.hc-result h2{font-size:clamp(22px,3vw,28px);line-height:1.15}
+.hc-card h2:focus{outline:none}
+.hc-sub{color:var(--muted);margin-top:-6px}
+.hc-label{font-size:14px;font-weight:500}
+.hc-opt{font-weight:400;color:var(--muted)}
+.hc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.hc-hp{position:absolute;left:-9999px}
+.hc-step{display:grid;gap:16px;padding:0}
+.hc-step[hidden]{display:none}
+textarea{font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-s);background:var(--paper);color:var(--ink);width:100%;resize:vertical}
+
+/* Progress */
+.hc-steps{list-style:none;margin:0 0 6px;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.hc-steps li{border-top:4px solid var(--line);padding-top:10px;font:500 11px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.hc-steps li.done{border-color:var(--better)}
+.hc-steps li.now{border-color:var(--gold);color:var(--ink)}
+@media (max-width:560px){.hc-steps li{font-size:0;letter-spacing:0}.hc-steps li.now{font-size:11px;letter-spacing:.1em;white-space:nowrap}}
+
+/* Inputs hidden inside card-like labels */
+.hc-role input,.hc-chip input,.hc-dot input,.hc-opt-row input{position:absolute;opacity:0;width:1px;height:1px}
+.hc-role:has(input:focus-visible),.hc-chip:has(input:focus-visible),.hc-dot:has(input:focus-visible),.hc-opt-row:has(input:focus-visible){outline:2px solid var(--signal);outline-offset:3px}
+
+/* Step 1: role cards */
+.hc-roles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hc-role{position:relative;display:grid;gap:10px;align-content:start;padding:16px;border:1px solid var(--line);border-radius:var(--radius-m);background:var(--paper);cursor:pointer;font-weight:400}
+.hc-role b{font:600 16px/1.25 var(--display)}
+.hc-role span{color:var(--muted);font-size:15px;line-height:1.5}
+.hc-role-else{border-style:dashed}
+.hc-role:has(input:checked){border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--signal-soft)}
+
+/* Step 2: chips */
+.hc-chips{display:flex;flex-wrap:wrap;gap:8px}
+.hc-chip{position:relative;display:inline-flex;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--paper);cursor:pointer;font-weight:400;font-size:15px}
+.hc-chip:has(input:checked){background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.hc-flash{animation:hc-flash .6s}
+@keyframes hc-flash{50%{color:var(--warn);font-weight:600}}
+
+/* Step 3: Likert */
+.hc-likert{display:grid;gap:4px}
+.hc-scale,.hc-poll{border:0;margin:0;padding:14px 0 16px;border-bottom:1px solid var(--line);min-width:0}
+.hc-scale:last-child,.hc-poll:last-child{border-bottom:0}
+.hc-scale legend,.hc-poll legend{font:600 16px/1.35 var(--display);padding:0;margin-bottom:12px;display:flex;gap:12px}
 .hc-n{font:500 12px/1.9 var(--mono);color:var(--muted)}
-.hc-quiz label{display:flex;align-items:center;gap:10px;font-weight:400;font-size:15px;border:1px solid var(--line);border-radius:var(--radius-s);padding:10px 12px;cursor:pointer;background:var(--paper)}
-.hc-quiz label:has(input:checked){border-color:var(--ink);background:var(--signal-soft)}
-.hc-quiz input[type=radio]{width:auto;margin:0;accent-color:var(--ink)}
-.hc-progress{font:500 13px var(--mono);color:var(--muted)}
+.hc-dots{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;position:relative}
+.hc-dot{position:relative;display:flex;justify-content:center;padding:6px 0;cursor:pointer}
+.hc-dot::before{content:"";width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--paper);transition:transform .12s}
+.hc-dot:nth-child(1)::before,.hc-dot:nth-child(5)::before{width:36px;height:36px}
+.hc-dot:nth-child(3)::before{width:24px;height:24px;margin-block:3px}
+.hc-dot:hover::before{border-color:var(--muted)}
+.hc-dot:has(input:checked)::before{background:var(--gold);border-color:var(--ink);transform:scale(1.08)}
+.hc-ends{display:flex;justify-content:space-between;font:500 11px var(--mono);color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+
+/* Step 4: polls */
+.hc-polls{display:grid;gap:4px}
+.hc-poll{display:grid;gap:8px}
+.hc-opt-row{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-s);background:var(--paper);cursor:pointer;font-weight:400;font-size:15px}
+.hc-opt-row::before{content:"";flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}
+.hc-opt-row:has(input:checked){border-color:var(--ink);background:var(--signal-soft)}
+.hc-opt-row:has(input:checked)::before{border:5px solid var(--ink)}
+
+/* Step 5: match + contact */
+.hc-match{border:1px solid var(--line);border-left:4px solid var(--better);border-radius:var(--radius-s);padding:14px 16px;display:grid;gap:6px;background:var(--paper)}
+.hc-match b{font:600 18px/1.2 var(--display)}
+.hc-match p{color:var(--muted);font-size:15px}
+.hc-match .checks{margin-top:4px;gap:4px;font-size:14px}
+.hc-focus{font-size:14px!important}
+
+.hc-nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hc-nav .btn-primary{margin-left:auto}
+.hc-nav .btn:disabled{opacity:.6;cursor:progress}
 .hc-warn{color:var(--warn)}
-.hc-result{position:sticky;top:88px}
-.hc-fixes-h{font-size:18px;margin-top:22px}
-.hc-fixes{margin:10px 0 0;padding-left:20px;display:grid;gap:8px;font-size:14px}
+.hc-fine{font:400 12px/1.4 var(--mono);color:var(--muted)}
+
+/* Results */
+.hc-result{display:grid;gap:24px}
+.hc-result:focus{outline:none}
+.hc-fixes-h{font-size:18px!important;margin-top:22px}
+.hc-fixes{margin:10px 0 0;padding-left:20px;display:grid;gap:8px;font-size:15px}
+.hc-after{display:grid;gap:14px}
+.hc-sent{font:500 14px/1.5 var(--body)}
 .bar i.mid{background:var(--gold)}
 .bar i.low{background:var(--warn)}
-@media (max-width:860px){.hc-layout{grid-template-columns:1fr}.hc-result{position:static}.hc-quiz fieldset{grid-template-columns:1fr}}
+@media (max-width:560px){.hc-roles{grid-template-columns:1fr}.hc-dot::before{width:26px;height:26px}.hc-dot:nth-child(1)::before,.hc-dot:nth-child(5)::before{width:30px;height:30px}}
+@media (prefers-reduced-motion:reduce){.hc-dot::before{transition:none}.hc-flash{animation:none}}

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Free Zoho CRM health check | ED Interactive Group</title>
-<meta name="description" content="Answer ten quick questions about your Zoho CRM and get an instant health score with the fixes that matter most. Then book a free read-only audit.">
+<meta name="description" content="Answer a few quick questions about your Zoho CRM and get an instant health score, the fixes that matter most, and a PDF report by email.">
 <link rel="canonical" href="https://edinteractivegroup.com/health-check/">
 <meta name="theme-color" content="#141518">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -14,7 +14,7 @@
 <link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="stylesheet" href="/assets/css/health-check.css">
-<script src="/assets/js/health-check.js" defer></script>
+<script type="module" src="/assets/js/health-check.js"></script>
 </head>
 <body>
 <header>
@@ -26,123 +26,95 @@
 
 <main id="top">
   <div class="wrap hc-intro">
-    <p class="eyebrow">Free CRM health check · 2 minutes</p>
+    <p class="eyebrow">Free CRM health check · 3 minutes</p>
     <h1>How healthy is your Zoho CRM?</h1>
-    <p class="lede">Answer ten quick questions. You get a score out of 100, a breakdown by area, and the fixes that will pay off first. No login, nothing connected to your CRM.</p>
+    <p class="lede">Answer a few quick questions. You get a score out of 100, a breakdown by area and the fixes that will pay off first, on screen and as a PDF by email. Nothing is connected to your CRM.</p>
   </div>
 
-  <div class="wrap hc-layout">
-    <form id="hc-quiz" class="hc-quiz" novalidate>
-      <fieldset data-area="data" data-fix="Merge duplicate contacts and accounts, then turn on duplicate checks so new ones are blocked at entry.">
-        <legend><span class="hc-n">01</span>How often do you find duplicate contacts or accounts?</legend>
-        <label><input type="radio" name="q1" value="10" required>Rarely</label>
-        <label><input type="radio" name="q1" value="5">Sometimes</label>
-        <label><input type="radio" name="q1" value="0">Often</label>
-        <label><input type="radio" name="q1" value="3">Not sure</label>
-      </fieldset>
-      <fieldset data-area="data" data-fix="Fill the key fields (industry, size, owner) on existing records and make them mandatory going forward.">
-        <legend><span class="hc-n">02</span>Are key fields like industry, company size and owner filled in?</legend>
-        <label><input type="radio" name="q2" value="10">On almost every record</label>
-        <label><input type="radio" name="q2" value="5">On about half</label>
-        <label><input type="radio" name="q2" value="0">Rarely</label>
-        <label><input type="radio" name="q2" value="3">Not sure</label>
-      </fieldset>
-      <fieldset data-area="data" data-fix="Add validation rules and picklists so bad data can't get in through forms, imports or reps.">
-        <legend><span class="hc-n">03</span>Do validation rules or picklists stop bad data at entry?</legend>
-        <label><input type="radio" name="q3" value="10">Yes, on the main modules</label>
-        <label><input type="radio" name="q3" value="5">A few</label>
-        <label><input type="radio" name="q3" value="0">None</label>
-        <label><input type="radio" name="q3" value="3">Not sure</label>
-      </fieldset>
-      <fieldset data-area="pipeline" data-fix="Review deals with no activity in 60 days: close the dead ones and assign next steps to the rest.">
-        <legend><span class="hc-n">04</span>How many open deals have had no activity in 60 days?</legend>
-        <label><input type="radio" name="q4" value="10">Very few</label>
-        <label><input type="radio" name="q4" value="5">Some</label>
-        <label><input type="radio" name="q4" value="0">A lot</label>
-        <label><input type="radio" name="q4" value="3">Not sure</label>
-      </fieldset>
-      <fieldset data-area="pipeline" data-fix="Define each deal stage with clear entry criteria so every rep moves deals the same way.">
-        <legend><span class="hc-n">05</span>Do all reps use deal stages the same way?</legend>
-        <label><input type="radio" name="q5" value="10">Yes</label>
-        <label><input type="radio" name="q5" value="5">Partly</label>
-        <label><input type="radio" name="q5" value="0">No</label>
-        <label><input type="radio" name="q5" value="3">Not sure</label>
-      </fieldset>
-      <fieldset data-area="pipeline" data-fix="Capture lead source on every lead and deal so you know which channels actually produce revenue.">
-        <legend><span class="hc-n">06</span>Is lead source tracked on every lead and deal?</legend>
-        <label><input type="radio" name="q6" value="10">Always</label>
-        <label><input type="radio" name="q6" value="5">Sometimes</label>
-        <label><input type="radio" name="q6" value="0">Rarely</label>
-        <label><input type="radio" name="q6" value="3">Not sure</label>
-      </fieldset>
-      <fieldset data-area="connected" data-fix="Link Zoho Books customers to CRM accounts so revenue, invoices and deals line up in one view.">
-        <legend><span class="hc-n">07</span>Are Zoho Books invoices matched to CRM accounts?</legend>
-        <label><input type="radio" name="q7" value="10">Yes, automatically</label>
-        <label><input type="radio" name="q7" value="5">By hand, when we have time</label>
-        <label><input type="radio" name="q7" value="0">Not connected</label>
-        <label><input type="radio" name="q7" value="3">We don't use Books</label>
-      </fieldset>
-      <fieldset data-area="connected" data-fix="Build one Zoho Analytics dashboard from CRM, Creator and Books that the team reviews every week.">
-        <legend><span class="hc-n">08</span>Does your team review a Zoho Analytics dashboard each week?</legend>
-        <label><input type="radio" name="q8" value="10">Yes</label>
-        <label><input type="radio" name="q8" value="5">Occasionally</label>
-        <label><input type="radio" name="q8" value="0">No</label>
-        <label><input type="radio" name="q8" value="3">Not sure</label>
-      </fieldset>
-      <fieldset data-area="connected" data-fix="Fix the numbers behind your reports first, so meetings are about decisions, not about whose figures are right.">
-        <legend><span class="hc-n">09</span>Do people trust the CRM reports in meetings?</legend>
-        <label><input type="radio" name="q9" value="10">Yes</label>
-        <label><input type="radio" name="q9" value="5">Sometimes</label>
-        <label><input type="radio" name="q9" value="0">No, we keep our own spreadsheets</label>
-      </fieldset>
-      <fieldset data-area="automation" data-fix="Automate follow-ups and lead routing with workflows and AI, with a person approving what goes out.">
-        <legend><span class="hc-n">10</span>Are follow-ups and lead routing automated?</legend>
-        <label><input type="radio" name="q10" value="10">Yes</label>
-        <label><input type="radio" name="q10" value="5">Partly</label>
-        <label><input type="radio" name="q10" value="0">No, it's all manual</label>
-      </fieldset>
-      <p class="hc-progress" id="hc-progress" aria-live="polite">0 of 10 answered</p>
-      <button class="btn btn-primary" type="submit" id="hc-see">See my score</button>
-      <p class="form-msg hc-warn" id="hc-warn" hidden>Please answer all ten questions to see your score.</p>
+  <div class="wrap hc-stage">
+    <form id="hc-flow" class="hc-card" novalidate>
+      <ol class="hc-steps">
+        <li data-step="0">You</li>
+        <li data-step="1">Your CRM</li>
+        <li data-step="2">Rate it</li>
+        <li data-step="3">Quick poll</li>
+        <li data-step="4">Contact</li>
+      </ol>
+
+      <section class="hc-step" data-step="0" aria-labelledby="hc-h0">
+        <h2 id="hc-h0" tabindex="-1">Which sounds most like you?</h2>
+        <p class="hc-sub">We use this to match you with the right practitioner.</p>
+        <div class="hc-roles" id="hc-roles" role="radiogroup" aria-labelledby="hc-h0"></div>
+      </section>
+
+      <section class="hc-step" data-step="1" aria-labelledby="hc-h1" hidden>
+        <h2 id="hc-h1" tabindex="-1">Where does the manual work pile up?</h2>
+        <p class="hc-sub" id="hc-pain-hint">Pick up to three.</p>
+        <div class="hc-chips" id="hc-pains" role="group" aria-labelledby="hc-h1"></div>
+        <p class="hc-label" id="hc-apps-l">Zoho apps you use</p>
+        <div class="hc-chips" id="hc-apps" role="group" aria-labelledby="hc-apps-l"></div>
+        <label class="hc-sr" for="hc-apps-other">Other Zoho apps</label>
+        <input id="hc-apps-other" type="text" placeholder="Others, e.g. Desk, Inventory, SalesIQ" maxlength="160">
+        <label>How many people use your CRM?
+          <select id="hc-users"></select>
+        </label>
+      </section>
+
+      <section class="hc-step" data-step="2" aria-labelledby="hc-h2" hidden>
+        <h2 id="hc-h2" tabindex="-1">How true is this for your business?</h2>
+        <p class="hc-sub">Tap one point on each scale. Go with your first instinct.</p>
+        <div id="hc-likert" class="hc-likert"></div>
+      </section>
+
+      <section class="hc-step" data-step="3" aria-labelledby="hc-h3" hidden>
+        <h2 id="hc-h3" tabindex="-1">Three quick polls</h2>
+        <p class="hc-sub">One answer each.</p>
+        <div id="hc-polls" class="hc-polls"></div>
+      </section>
+
+      <section class="hc-step" data-step="4" aria-labelledby="hc-h4" hidden>
+        <p class="eyebrow">Your match</p>
+        <div class="hc-match" id="hc-match"></div>
+        <h2 id="hc-h4" tabindex="-1">Where should we send your health check?</h2>
+        <label>Name<input id="hc-name" type="text" autocomplete="name" maxlength="120" required></label>
+        <label>Work email<input id="hc-email" type="email" autocomplete="email" maxlength="200" placeholder="you@company.com" required></label>
+        <label>Company<input id="hc-company" type="text" autocomplete="organization" maxlength="160"></label>
+        <label><span>Phone <span class="hc-opt">(optional)</span></span><input id="hc-phone" type="tel" autocomplete="tel" maxlength="40"></label>
+        <label><span>Anything we should know? <span class="hc-opt">(optional)</span></span>
+          <textarea id="hc-notes" rows="3" maxlength="1500" placeholder="e.g. we migrated from Salesforce last year"></textarea>
+        </label>
+        <div class="hc-hp" aria-hidden="true"><label>Website<input id="hc-website" type="text" tabindex="-1" autocomplete="off"></label></div>
+      </section>
+
+      <p class="form-msg hc-warn" id="hc-warn" role="alert" hidden></p>
+      <div class="hc-nav">
+        <button class="btn btn-ghost" type="button" id="hc-back" hidden>← Back</button>
+        <button class="btn btn-primary" type="submit" id="hc-next">Continue →</button>
+      </div>
+      <p class="hc-fine" id="hc-fine" hidden>Read-only access only. We never change your data during a health check.</p>
     </form>
 
-    <aside class="panel hc-result" id="hc-result" aria-live="polite" hidden>
-      <div class="panel-head"><b>Your CRM health check</b><span class="eyebrow">Self-assessment</span></div>
-      <div class="score"><span class="num" id="hc-score">0</span><span class="to">/100<br><span id="hc-band"></span></span></div>
-      <div class="rows" id="hc-areas"></div>
-      <h2 class="hc-fixes-h">Fix these first</h2>
-      <ol class="hc-fixes" id="hc-fixes"></ol>
-      <p class="panel-foot">Based on your answers only. The full audit reads your CRM and Books through the API (read-only, no changes made).</p>
-    </aside>
-  </div>
-
-  <section id="start" class="flush-top" hidden>
-    <div class="wrap closer">
-      <div>
-        <h2>Get the full audit, free.</h2>
-        <p>We confirm your score against your real data and send a ranked fix list with the revenue each fix is worth.</p>
-        <ul class="checks">
-          <li>Score across duplicates, completeness and activity</li>
-          <li>Top ten fixes ranked by revenue impact</li>
-          <li>A 30-minute walkthrough, no obligation</li>
-        </ul>
+    <div id="hc-result" class="hc-result" hidden tabindex="-1">
+      <div class="panel">
+        <div class="panel-head"><b>Your CRM health check</b><span class="eyebrow" id="hc-for"></span></div>
+        <div class="score"><span class="num" id="hc-score">0</span><span class="to">/100<br><span id="hc-band"></span></span></div>
+        <div class="rows" id="hc-areas"></div>
+        <h2 class="hc-fixes-h">Fix these first</h2>
+        <ol class="hc-fixes" id="hc-fixes"></ol>
+        <p class="panel-foot">Based on your answers only. The full audit checks your real CRM and Books data through the API, read-only.</p>
       </div>
-      <form id="hc-form" novalidate>
-        <label>Name<input id="hc-name" type="text" name="name" autocomplete="name"></label>
-        <label>Work email<input id="hc-email" name="email" type="email" autocomplete="email" placeholder="you@company.com"></label>
-        <label>Zoho apps you use
-          <select id="hc-apps" name="apps"><option>CRM only</option><option selected>CRM + Books</option><option>CRM + Creator + Books</option><option>Zoho One</option><option value="Other">Other</option></select>
-        </label>
-        <label id="hc-other-wrap" hidden>Ok, which one?
-          <input id="hc-other" name="apps_other" type="text" placeholder="e.g. Desk, Campaigns, Inventory">
-        </label>
-        <input type="hidden" name="hc_score" id="hc-score-field">
-        <input type="hidden" name="hc_answers" id="hc-answers-field">
-        <button class="btn btn-primary" type="submit">Request my full audit</button>
-        <p class="form-msg" id="hc-msg" hidden>Thanks. We will be in touch within one business day.</p>
-      </form>
+      <div class="hc-after">
+        <p class="eyebrow">Your match</p>
+        <div class="hc-match" id="hc-match-2"></div>
+        <p class="hc-sent" id="hc-sent" aria-live="polite"></p>
+        <div class="hc-nav">
+          <button class="btn btn-primary" type="button" id="hc-pdf">Download the PDF</button>
+          <a class="btn btn-ghost" href="/">Back to home</a>
+        </div>
+        <p class="hc-fine">We'll be in touch within one business day to book your free 30-minute walkthrough.</p>
+      </div>
     </div>
-  </section>
+  </div>
 </main>
 
 <footer>
