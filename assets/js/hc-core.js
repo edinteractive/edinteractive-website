@@ -1,5 +1,5 @@
 // CRM health check: the questions, the scoring and the practitioner match.
-// Shared by the page (assets/js/health-check.js) and the report function
+// Shared by the page (assets/js/hc-app.js) and the report function
 // (functions/api/health-check.js), so the score in the PDF always matches the screen.
 
 export const ROLES = [

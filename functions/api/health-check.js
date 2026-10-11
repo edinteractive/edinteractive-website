@@ -10,8 +10,8 @@
 // never emailed to the address typed in (only the copy to NOTIFY_TO), so the form can't be used
 // to send mail to strangers from our domain. The visitor still gets the PDF download.
 // Every health check also becomes a Lead in Zoho CRM through the Web-to-Lead form below (no keys needed).
-import { clean, validEmail, score, summary, auditLine } from '../../assets/js/hc-model.js';
-import { buildPdf } from '../../assets/js/hc-pdf.js';
+import { clean, validEmail, score, summary, auditLine } from '../../assets/js/hc-core.js';
+import { buildPdf } from '../../assets/js/hc-report.js';
 
 // From the Zoho CRM Web-to-Lead form's embed code (Setup > Developer Hub > Webforms). These values are public.
 // Form: "Zoho Health Checkup" (US data centre). Leave xnQsjsdp empty to skip the CRM step.
