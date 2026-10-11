@@ -17,3 +17,11 @@ li.open > .zb-ct-time {
   background: #FFC21A !important;
   color: #141518 !important;
 }
+
+/* Booking-form dropdowns: room for every option, and long options wrap instead of being cut off. */
+.zcb-drop-down-search { max-height: none !important; }
+.zcb-drop-down-search .zcb-element { max-height: 320px !important; }
+.zcb-drop-down-search .zcb-element > div { height: auto !important; min-height: 38px; }
+.zcb-drop-down-search .zcb-element .text-ellipsis { white-space: normal !important; text-overflow: clip !important; height: auto !important; line-height: 1.35; }
+.zcb-drop-down-search .zcb-element .field-center,
+.zcb-drop-down-search .zcb-element .flex-column { height: auto !important; }
