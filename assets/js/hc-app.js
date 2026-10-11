@@ -6,11 +6,14 @@ import { buildPdf } from './hc-report.js?v=3';
 const $ = id => document.getElementById(id);
 // The page's own language (<html lang="fr-CA"> on /fr/bilan-crm/) picks the wording.
 const L = langOf(document.documentElement.lang);
+// "02, 05 and 07" / "02, 05 et 07"
+const list = (ns, and) => ns.length < 2 ? ns.join('') : ns.slice(0, -1).join(', ') + ' ' + and + ' ' + ns[ns.length - 1];
 const UI = {
   en: {
     tsError: "Our security check couldn't verify this browser. Try again, turn off a VPN or ad blocker, or email david@edinteractive.digital and we'll run the health check with you.",
     choose: 'Choose one', role: 'Pick the option that sounds most like you.',
-    rate: left => `Rate ${left === 1 ? 'the last statement' : 'the remaining ' + left + ' statements'} to continue.`,
+    rate: ns => ns.length === 1 ? `Rate statement ${ns[0]} to continue.` : `Rate statements ${list(ns, 'and')} to continue.`,
+    pollsLeft: n => n === 1 ? 'Answer the highlighted poll to continue.' : 'Answer the highlighted polls to continue.',
     polls: 'Answer all three polls to continue.', name: 'Please add your name.', email: 'Please add a valid work email.',
     submit: 'Request my health check', next: 'Continue →', focus: 'Health check focus: ',
     tsWait: 'One moment: the security check is still running. Try again in a few seconds.', building: 'Building your report…',
@@ -24,7 +27,8 @@ const UI = {
   fr: {
     tsError: 'Notre vérification de sécurité n’a pas pu valider ce navigateur. Réessayez, désactivez votre RPV ou votre bloqueur de publicité, ou écrivez à david@edinteractive.digital et nous ferons le bilan avec vous.',
     choose: 'Choisissez', role: 'Choisissez l’option qui vous ressemble le plus.',
-    rate: left => left === 1 ? 'Évaluez le dernier énoncé pour continuer.' : `Évaluez les ${left} énoncés restants pour continuer.`,
+    rate: ns => ns.length === 1 ? `Évaluez l’énoncé ${ns[0]} pour continuer.` : `Évaluez les énoncés ${list(ns, 'et')} pour continuer.`,
+    pollsLeft: n => n === 1 ? 'Répondez au sondage en surbrillance pour continuer.' : 'Répondez aux sondages en surbrillance pour continuer.',
     polls: 'Répondez aux trois sondages pour continuer.', name: 'Veuillez indiquer votre nom.', email: 'Veuillez indiquer un courriel professionnel valide.',
     submit: 'Recevoir mon bilan', next: 'Continuer →', focus: 'Points à examiner : ',
     tsWait: 'Un instant : la vérification de sécurité est en cours. Réessayez dans quelques secondes.', building: 'Préparation de votre rapport…',
@@ -151,6 +155,7 @@ for (const u of CRM_USERS) users.appendChild(new Option(u, u));
 const SCALE = likert(L);
 STATEMENTS.forEach((s, i) => {
   const fs = el('fieldset', 'hc-scale');
+  fs.id = 'hc-fs-' + s.id;
   const lg = el('legend');
   lg.appendChild(el('span', 'hc-n', String(i + 1).padStart(2, '0')));
   lg.appendChild(el('span', null, worded('statements', s, false, L).text)).id = 'hc-st-' + s.id;
@@ -174,6 +179,7 @@ STATEMENTS.forEach((s, i) => {
 for (const poll of POLLS) {
   const p = worded('polls', poll, false, L);
   const fs = el('fieldset', 'hc-poll');
+  fs.id = 'hc-pf-' + poll.id;
   fs.appendChild(el('legend', null, p.q));
   p.options.forEach(([label], i) => {
     const [lab] = choice('radio', 'poll-' + p.id, String(i), 'hc-opt-row');
@@ -199,18 +205,32 @@ function answers() {
   };
 }
 
-function problem(step) {
-  if (step === 0 && !picked('role').length) return UI.role;
+// What still needs an answer on a step: the message, and the blocks to highlight.
+function check(step) {
+  if (step === 0 && !picked('role').length) return { msg: UI.role, miss: [$('hc-roles')] };
   if (step === 2) {
-    const left = STATEMENTS.filter(s => !picked('lk-' + s.id).length).length;
-    if (left) return UI.rate(left);
+    const left = STATEMENTS.map((s, i) => [s, String(i + 1).padStart(2, '0')]).filter(([s]) => !picked('lk-' + s.id).length);
+    if (left.length) return { msg: UI.rate(left.map(x => x[1])), miss: left.map(([s]) => $('hc-fs-' + s.id)) };
   }
-  if (step === 3 && POLLS.some(p => !picked('poll-' + p.id).length)) return UI.polls;
+  if (step === 3) {
+    const left = POLLS.filter(p => !picked('poll-' + p.id).length);
+    if (left.length) return { msg: UI.pollsLeft(left.length), miss: left.map(p => $('hc-pf-' + p.id)) };
+  }
   if (step === 4) {
-    if (!$('hc-name').value.trim()) return UI.name;
-    if (!validEmail($('hc-email').value.trim())) return UI.email;
+    if (!$('hc-name').value.trim()) return { msg: UI.name, miss: [$('hc-name').closest('label')] };
+    if (!validEmail($('hc-email').value.trim())) return { msg: UI.email, miss: [$('hc-email').closest('label')] };
   }
-  return '';
+  return { msg: '', miss: [] };
+}
+const problem = step => check(step).msg;
+// Shade every unanswered block and bring the first one into view, so it's clear what was missed.
+function highlight(miss) {
+  for (const n of form.querySelectorAll('.hc-missing')) n.classList.remove('hc-missing');
+  for (const n of miss) n.classList.add('hc-missing');
+  if (!miss.length) return;
+  miss[0].scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  const first = miss[0].querySelector('input:not([type=hidden])') || miss[0];
+  first.focus({ preventScroll: true });
 }
 
 function show(step) {
@@ -240,14 +260,24 @@ function renderMatch(box, m) {
   if (pains.length) box.appendChild(el('p', 'hc-focus', UI.focus + pains.join(', ')));
 }
 
-form.addEventListener('change', () => { if (!warn.hidden && !problem(at)) warn.hidden = true; });
+form.addEventListener('change', e => {
+  // An answered block loses its highlight straight away.
+  const box = e.target.closest('.hc-missing');
+  if (box && !check(at).miss.includes(box)) box.classList.remove('hc-missing');
+  if (!warn.hidden && !problem(at)) warn.hidden = true;
+});
+form.addEventListener('input', e => {
+  const box = e.target.closest('label.hc-missing');
+  if (box && e.target.value.trim()) box.classList.remove('hc-missing');
+});
 
 $('hc-back').addEventListener('click', () => { show(at - 1); steps[at].querySelector('h2').focus(); });
 
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  const msg = problem(at);
-  if (msg) { warn.textContent = msg; warn.hidden = false; return; }
+  const { msg, miss } = check(at);
+  if (msg) { warn.textContent = msg; warn.hidden = false; highlight(miss); return; }
+  highlight([]);
   if (at < steps.length - 1) { show(at + 1); steps[at].querySelector('h2').focus(); form.scrollIntoView({ block: 'start' }); return; }
   await finish();
 });
