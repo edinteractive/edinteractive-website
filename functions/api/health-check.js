@@ -18,7 +18,9 @@ import { buildPdf } from '../../assets/js/hc-report.js';
 const WEB_TO_LEAD = {
   url: 'https://crm.zoho.com/crm/WebToLeadForm',
   xnQsjsdp: '62bd2a3d68e0021f184f3c225b99346663884849d4ef2b4f25ccde71bda07148',
-  xmIwtLD: '9e90b8692907b49ef0159284da9ae6ea3cec2e0582b1d0611e7a26852b786837dd154a51637adfa23a299e8ce4e573e5', actionType: 'TGVhZHM=', leadSource: 'Website - CRM health check'
+  xmIwtLD: '9e90b8692907b49ef0159284da9ae6ea3cec2e0582b1d0611e7a26852b786837dd154a51637adfa23a299e8ce4e573e5', actionType: 'TGVhZHM=', leadSource: 'Website - CRM health check', leadStatus: 'Not Contacted',
+  // Custom Lead fields on the form (Setup > Modules and Fields > Leads), named as Zoho's embed code names them.
+  scoreField: 'LEADCF52', resultsField: 'LEADCF15'
 };
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
@@ -63,7 +65,7 @@ async function verified(env, token, ip) {
   } catch (err) { console.error('Turnstile', err); return false; }
 }
 
-// Posts the lead to Zoho CRM. Answers, score and fixes go in Description so they show on the Lead record.
+// Posts the lead to Zoho CRM. The score goes in Health Check Score; answers and fixes in Health Check Results.
 async function crmLead(a, r, emailed, site) {
   if (!WEB_TO_LEAD.xnQsjsdp) return false;
   const parts = a.name.trim().split(/\s+/);
@@ -75,7 +77,9 @@ async function crmLead(a, r, emailed, site) {
   const body = new URLSearchParams({
     xnQsjsdp: WEB_TO_LEAD.xnQsjsdp, zc_gad: '', xmIwtLD: WEB_TO_LEAD.xmIwtLD, actionType: WEB_TO_LEAD.actionType,
     returnURL: `https://${site}/health-check/`, 'First Name': first, 'Last Name': last, Email: a.email,
-    Company: a.company || a.name, Phone: a.phone, Description: desc.slice(0, 30000), 'Lead Source': WEB_TO_LEAD.leadSource,
+    Company: a.company || a.name, Phone: a.phone, 'Lead Source': WEB_TO_LEAD.leadSource,
+    'Lead Status': WEB_TO_LEAD.leadStatus, [WEB_TO_LEAD.scoreField]: String(r.total),
+    [WEB_TO_LEAD.resultsField]: desc.slice(0, 30000),
     aG9uZXlwb3Q: '' // Zoho's own honeypot, must be empty
   });
   const res = await fetch(WEB_TO_LEAD.url, { method: 'POST', body, redirect: 'manual' });
