@@ -99,9 +99,9 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   // Score.
   y -= 62;
   text(M, y, String(r.total), 56, true, C.ink);
-  const nx = M + width(String(r.total), 56, true) + 8;
-  text(nx, y + 22, '/100', 13, false, C.muted);
-  text(nx, y + 4, r.band, 13, true, r.total >= 80 ? C.teal : C.deep);
+  const nx = M + width(String(r.total), 56, true);
+  text(nx, y, '%', 28, true, C.ink);
+  text(nx + width('%', 28, true) + 10, y + 4, r.band, 13, true, r.total >= 80 ? C.teal : C.deep);
 
   // Areas.
   heading('Score by area');
