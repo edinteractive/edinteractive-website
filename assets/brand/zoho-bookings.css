@@ -36,6 +36,7 @@ li.open > .zb-ct-time {
 /* Email "Verify" link: inside the email box instead of hanging outside the card. */
 .label-container .zb-otp-verify-btn-inline { left: -58px !important; right: auto !important; top: 45px !important; font-weight: 600; }
 .label-container:has(.zb-otp-verify-btn-inline) input { padding-right: 66px !important; text-overflow: ellipsis; }
-/* Helper text under the open "business results" question (the form's only text box); Zoho has no help-text setting. */
-.bookings-field-theme > .label-container:has(textarea) > div:first-child::after { content: "Specify your ideal performance goal metrics, e.g. 5–10%+ ROI, 5–10%+ conversion lift, etc."; display: block; font-weight: 400; font-size: 13px; line-height: 1.4; color: #5F626A; margin-top: 4px; }
+/* Hint inside the empty "business results" box (the form's only text box); Zoho has no placeholder setting. Hidden once typing starts. */
+.bookings-field-theme > .label-container .input-box:has(textarea) { position: relative !important; }
+.bookings-field-theme > .label-container .input-box:has(textarea:placeholder-shown)::before { content: "Specify your ideal performance goal metrics, e.g. 5–10%+ ROI, 5–10%+ conversion lift, etc."; position: absolute; left: 12px; right: 12px; top: 10px; font-size: 13px; line-height: 1.45; color: #8A8D94; pointer-events: none; z-index: 2; }
 .bookings-field-theme > .label-container textarea::placeholder { color: transparent; }
