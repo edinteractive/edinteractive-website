@@ -7,28 +7,37 @@
   const pick = (...keys) => {
     for (const k of keys) {
       const v = (lower.get(k) || '').trim();
-      if (v && v.length < 200 && !/^https?:|^\{|^\$\{/i.test(v)) return v;
+      if (v && v.length < 200 && !/^https?:|^\{|^\$\{|^(undefined|null)$/i.test(v)) return v;
     }
     return '';
   };
 
-  const name = pick('customer_name', 'name', 'first_name', 'customername');
+  const name = pick('customer_first_name', 'customer_name', 'name', 'first_name');
   const first = name.split(/\s+/)[0];
   if (first && first.length > 1) {
     document.querySelector('[data-bk-name]').textContent = ', ' + first;
   }
 
-  const date = pick('booking_date', 'appointment_date', 'date', 'start_date');
-  const time = pick('booking_time', 'appointment_time', 'start_time', 'time', 'from_time');
-  const when = pick('appointment_start_time', 'start_datetime', 'booked_time') ||
-    [date, time].filter(Boolean).join(' · ');
+  // Zoho sends booking_start_time as an ISO date; show it in the visitor's own time zone.
+  let when = '', tz = '';
+  const start = new Date(pick('booking_start_time'));
+  if (!isNaN(start)) {
+    try {
+      when = start.toLocaleString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+      tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    } catch (e) { when = start.toString(); }
+  } else {
+    const date = pick('booking_date', 'appointment_date', 'date');
+    const time = pick('booking_time', 'appointment_time', 'time');
+    when = [date, time].filter(Boolean).join(' · ');
+  }
 
   const rows = {
-    service: pick('service_name', 'service', 'event_name', 'servicename'),
-    staff: pick('staff_name', 'staff', 'host', 'staffname'),
+    service: pick('service_name', 'service'),
+    staff: pick('assigned_to', 'staff_name', 'staff'),
     when,
-    tz: pick('time_zone', 'timezone', 'customer_timezone', 'tz'),
-    id: pick('booking_id', 'bookingid', 'appointment_id', 'id'),
+    tz: pick('time_zone', 'timezone') || tz,
+    id: pick('booking_id', 'appointment_id'),
   };
 
   let any = false;
