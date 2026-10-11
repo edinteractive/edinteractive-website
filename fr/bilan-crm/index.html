@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bilan de santé Zoho CRM gratuit | ED Interactive Group</title>
+<meta name="description" content="Répondez à quelques questions rapides sur votre Zoho CRM et obtenez sur-le-champ un résultat, les correctifs les plus importants et un rapport PDF par courriel.">
+<link rel="canonical" href="https://edinteractive.digital/fr/bilan-crm/">
+<link rel="alternate" hreflang="en" href="https://edinteractive.digital/health-check/">
+<link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/bilan-crm/">
+<link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/health-check/">
+<!-- Cloudflare Turnstile site key (public), same widget as the English page. Secret: TURNSTILE_SECRET in Pages. -->
+<meta name="turnstile-sitekey" content="0x4AAAAAAFTg4JlPA7Wq3ATB">
+<meta name="theme-color" content="#141518">
+<link rel="icon" href="/favicon.ico?v=2" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png?v=2">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon-180x180.png?v=2">
+<link rel="preload" href="/assets/fonts/familjen-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=7">
+<link rel="stylesheet" href="/assets/css/health-check.css?v=6">
+<script type="module" src="/assets/js/hc-app.js?v=2"></script>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/fr/" aria-label="Accueil ED Interactive"><span class="mark" role="img" aria-label="monogramme ed"></span>ED Interactive</a>
+    <ul>
+      <li><a href="/fr/#approach">Approche</a></li>
+      <li><a href="/fr/#services">Services</a></li>
+      <li><a href="/fr/#process">Notre méthode</a></li>
+      <li><a href="/fr/#why">Pourquoi ED</a></li>
+      <li><a href="/fr/#voices">Clients</a></li>
+    </ul>
+    <a class="btn btn-ghost nav-consult" href="https://bookings.edinteractive.digital/meetwithed30min" target="_blank" rel="noopener">Réserver un appel</a>
+    <a class="btn btn-primary" href="/fr/bilan-crm/" aria-current="page">Bilan CRM gratuit →</a>
+    <a class="nav-lang" href="/health-check/" hreflang="en" lang="en" title="English">EN</a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hc-intro">
+    <p class="eyebrow">Bilan de santé CRM gratuit · 3 minutes</p>
+    <h1>Votre CRM est-il en santé?</h1>
+    <p class="lede">Répondez à quelques questions rapides. Vous obtenez un résultat en pourcentage, une analyse par volet et les correctifs qui rapporteront en premier, à l’écran et en PDF par courriel. Rien n’est connecté à votre CRM.</p>
+  </div>
+
+  <div class="wrap hc-stage">
+    <form id="hc-flow" class="hc-card" novalidate>
+      <ol class="hc-steps">
+        <li data-step="0">Vous</li>
+        <li data-step="1">Votre CRM</li>
+        <li data-step="2">Évaluation</li>
+        <li data-step="3">Sondage</li>
+        <li data-step="4">Coordonnées</li>
+      </ol>
+
+      <section class="hc-step" data-step="0" aria-labelledby="hc-h0">
+        <h2 id="hc-h0" tabindex="-1">Lequel vous ressemble le plus?</h2>
+        <p class="hc-sub">Nous l’utilisons pour vous jumeler au bon spécialiste.</p>
+        <div class="hc-roles" id="hc-roles" role="radiogroup" aria-labelledby="hc-h0"></div>
+      </section>
+
+      <section class="hc-step" data-step="1" aria-labelledby="hc-h1" hidden>
+        <h2 id="hc-h1" tabindex="-1">Où le travail manuel s’accumule-t-il?</h2>
+        <p class="hc-sub" id="hc-pain-hint">Choisissez-en jusqu’à trois.</p>
+        <div class="hc-chips" id="hc-pains" role="group" aria-labelledby="hc-h1"></div>
+        <p class="hc-label" id="hc-apps-l">Applications Zoho utilisées</p>
+        <div class="hc-chips" id="hc-nozoho" role="group" aria-labelledby="hc-apps-l"></div>
+        <div class="hc-chips" id="hc-apps" role="group" aria-labelledby="hc-apps-l"></div>
+        <label class="hc-sr" for="hc-apps-other">Autres applications Zoho</label>
+        <input id="hc-apps-other" type="text" placeholder="Autres, p. ex. Desk, Inventory, SalesIQ" maxlength="160">
+        <div class="hc-crm-wrap" id="hc-crm-wrap" hidden>
+          <p class="hc-label" id="hc-crms-l">Qu’utilisez-vous aujourd’hui pour vos clients et vos affaires?</p>
+          <div class="hc-chips" id="hc-crms" role="group" aria-labelledby="hc-crms-l"></div>
+          <label class="hc-sr" for="hc-crm-other">Autre chose</label>
+          <input id="hc-crm-other" type="text" placeholder="Autre chose? Dites-nous lequel" maxlength="160">
+        </div>
+        <label>Combien de personnes utilisent votre CRM?
+          <select id="hc-users"></select>
+        </label>
+      </section>
+
+      <section class="hc-step" data-step="2" aria-labelledby="hc-h2" hidden>
+        <h2 id="hc-h2" tabindex="-1">À quel point est-ce vrai pour votre entreprise?</h2>
+        <p class="hc-sub">Choisissez un point sur chaque échelle. Fiez-vous à votre premier instinct.</p>
+        <div id="hc-likert" class="hc-likert"></div>
+      </section>
+
+      <section class="hc-step" data-step="3" aria-labelledby="hc-h3" hidden>
+        <h2 id="hc-h3" tabindex="-1">Trois petits sondages</h2>
+        <p class="hc-sub">Une réponse chacun.</p>
+        <div id="hc-polls" class="hc-polls"></div>
+      </section>
+
+      <section class="hc-step" data-step="4" aria-labelledby="hc-h4" hidden>
+        <p class="eyebrow">Votre spécialiste</p>
+        <div class="hc-match" id="hc-match"></div>
+        <h2 id="hc-h4" tabindex="-1">Où devons-nous envoyer votre bilan?</h2>
+        <label>Nom<input id="hc-name" type="text" autocomplete="name" maxlength="120" required></label>
+        <label>Courriel professionnel<input id="hc-email" type="email" autocomplete="email" maxlength="200" placeholder="vous@entreprise.com" required></label>
+        <label>Entreprise<input id="hc-company" type="text" autocomplete="organization" maxlength="160"></label>
+        <label><span>Téléphone <span class="hc-opt">(facultatif)</span></span><input id="hc-phone" type="tel" autocomplete="tel" maxlength="40"></label>
+        <label><span>Autre chose à nous dire? <span class="hc-opt">(facultatif)</span></span>
+          <textarea id="hc-notes" rows="3" maxlength="1500" placeholder="p. ex. nous avons migré de Salesforce l’an dernier"></textarea>
+        </label>
+        <div id="hc-ts" class="hc-ts"></div>
+        <div class="hc-hp" aria-hidden="true"><label>Site Web<input id="hc-website" type="text" tabindex="-1" autocomplete="off"></label></div>
+      </section>
+
+      <p class="form-msg hc-warn" id="hc-warn" role="alert" hidden></p>
+      <div class="hc-nav">
+        <button class="btn btn-ghost" type="button" id="hc-back" hidden>← Retour</button>
+        <button class="btn btn-primary" type="submit" id="hc-next">Continuer →</button>
+      </div>
+      <p class="hc-fine" id="hc-fine" hidden>Accès en lecture seule. Nous ne modifions jamais vos données pendant un bilan.</p>
+    </form>
+
+    <div id="hc-result" class="hc-result" hidden tabindex="-1">
+      <div class="panel">
+        <div class="panel-head"><b>Votre bilan de santé CRM</b><span class="eyebrow" id="hc-for"></span></div>
+        <div class="score"><span class="num"><span id="hc-score">0</span><span class="pct">&nbsp;%</span></span><span class="to"><span id="hc-band"></span></span></div>
+        <div class="rows" id="hc-areas"></div>
+        <h2 class="hc-fixes-h">À corriger en premier</h2>
+        <ol class="hc-fixes" id="hc-fixes"></ol>
+        <p class="panel-foot" id="hc-foot">Selon vos réponses seulement. L’audit complet vérifie vos vraies données CRM et Books par l’API, en lecture seule.</p>
+      </div>
+      <div class="hc-after">
+        <p class="eyebrow">Votre spécialiste</p>
+        <div class="hc-match" id="hc-match-2"></div>
+        <p class="hc-sent" id="hc-sent" aria-live="polite"></p>
+        <div class="hc-nav hc-nav-end">
+          <button class="btn btn-ghost" type="button" id="hc-pdf">Télécharger le PDF</button>
+          <a class="btn btn-primary" id="hc-book" href="https://bookings.edinteractive.digital/meetwithed30min" target="_blank" rel="noopener">Réserver un appel →</a>
+        </div>
+        <p class="eyebrow">Voyez un exemple de rapport d’audit complet pour votre secteur</p>
+        <div class="hc-chips">
+          <a class="hc-chip" id="hc-s-fab" href="/fr/exemple-rapport/">Fabrication</a>
+          <a class="hc-chip" id="hc-s-train" href="/fr/exemple-rapport/formation/">Formation</a>
+        </div>
+        <p class="hc-fine">Nous vous écrirons d’ici un jour ouvrable pour fixer votre appel stratégique Zoho et IA gratuit de 30 minutes.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="/fr/"><span class="mark" aria-hidden="true"></span>ED Interactive Group</a>
+    <span>B2B différent, meilleur, plus futé.</span>
+    <span>© 2026 ED Interactive Group</span>
+  </div>
+</footer>
+</body>
+</html>

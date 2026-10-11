@@ -66,17 +66,20 @@ async function verified(env, token, ip) {
 }
 
 // Posts the lead to Zoho CRM. The score goes in Health Check Score; answers and fixes in Health Check Results.
+// The lead note is always in English (with the visitor's language on the first line) so leads read the same.
 async function crmLead(a, r, emailed, site) {
   if (!WEB_TO_LEAD.xnQsjsdp) return false;
+  const lang = a.lang;
+  a = { ...a, lang: 'en' }; r = score(a);
   const parts = a.name.trim().split(/\s+/);
   const last = parts.length > 1 ? parts.pop() : parts[0];
   const first = parts.length && last !== parts[0] ? parts.join(' ') : last; // the form requires both names
-  const desc = [`CRM health check score: ${r.total}% (${r.band})`, `Match: ${r.match.title}`,
+  const desc = [`Language: ${lang === 'fr' ? 'French' : 'English'}`, `CRM health check score: ${r.total}% (${r.band})`, `Match: ${r.match.title}`,
     `Report emailed: ${emailed ? 'yes' : 'no'}`, '', 'Fix these first:', ...r.fixes.map((f, i) => `${i + 1}. ${f}`), '',
     ...summary(a).map(([q, v]) => `${q}: ${v}`), ...(a.notes ? ['', 'Notes: ' + a.notes] : [])].join('\n');
   const body = new URLSearchParams({
     xnQsjsdp: WEB_TO_LEAD.xnQsjsdp, zc_gad: '', xmIwtLD: WEB_TO_LEAD.xmIwtLD, actionType: WEB_TO_LEAD.actionType,
-    returnURL: `https://${site}/health-check/`, 'First Name': first, 'Last Name': last, Email: a.email,
+    returnURL: `https://${site}${lang === 'fr' ? '/fr/bilan-crm/' : '/health-check/'}`, 'First Name': first, 'Last Name': last, Email: a.email,
     Company: a.company || a.name, Phone: a.phone, 'Lead Source': WEB_TO_LEAD.leadSource,
     'Lead Status': WEB_TO_LEAD.leadStatus, [WEB_TO_LEAD.scoreField]: String(r.total),
     [WEB_TO_LEAD.resultsField]: desc.slice(0, 30000),
@@ -174,10 +177,15 @@ export async function onRequestPost({ request, env }) {
 
   const from = addr(env.SMTP_USER, 'ED Interactive Group');
   const notify = env.NOTIFY_TO || env.SMTP_USER;
-  const pdfName = 'crm-health-check.pdf';
+  const fr = a.lang === 'fr';
+  const pdfName = fr ? 'bilan-crm.pdf' : 'crm-health-check.pdf';
   const first = a.name.split(/\s+/)[0];
   const fixes = r.fixes.map(f => `<li>${esc(f)}</li>`).join('');
-  const prospectHtml = `<p>Hi ${esc(first)},</p>
+  const prospectHtml = fr ? `<p>Bonjour ${esc(first)},</p>
+<p>Merci d’avoir fait le bilan de santé CRM. Votre résultat est de <b>${r.total}&nbsp;%</b> : ${esc(r.band)}</p>
+${fixes ? `<p>Les correctifs qui rapporteront en premier :</p><ol>${fixes}</ol>` : ''}
+<p>Votre rapport complet est joint en PDF. La prochaine étape est un audit complet gratuit. ${esc(auditLine(a))} <a href="${origin}/fr/exemple-rapport/">Voyez un exemple de rapport</a>, puis répondez simplement à ce courriel pour réserver un moment.</p>
+<p>ED Interactive Group<br>B2B différent, meilleur, plus futé.</p>` : `<p>Hi ${esc(first)},</p>
 <p>Thanks for taking the CRM health check. Your score is <b>${r.total}%</b>: ${esc(r.band)}</p>
 ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
 <p>Your full report is attached as a PDF. The next step is a free full audit. ${esc(auditLine(a))} <a href="${origin}/sample-report/">See a sample report</a>, then just reply to this email to book a time.</p>
@@ -185,19 +193,21 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
 
   if (human) try {
     await smtp(env, [a.email], mime({
-      from, to: addr(a.email, a.name), replyTo: addr(notify), subject: `Your CRM health check: ${r.total}%`,
+      from, to: addr(a.email, a.name), replyTo: addr(notify), subject: fr ? `Votre bilan de santé CRM : ${r.total} %` : `Your CRM health check: ${r.total}%`,
       html: prospectHtml, pdf, pdfName
     }));
     emailed = true;
   } catch (err) { console.error(err); }
 
   const crm = await lead();
-  const rows = [['Name', a.name], ['Email', a.email], ['Company', a.company], ['Phone', a.phone], ['Notes', a.notes],
-    ['Score', `${r.total}% (${r.band})`], ['Match', r.match.title], ['Report emailed', emailed ? 'Yes' : 'No'], ['Zoho CRM', crm || 'not sent'], ...summary(a)]
+  // The copy to us is in English whatever language the visitor used.
+  const en = { ...a, lang: 'en' }, re = score(en);
+  const rows = [['Language', fr ? 'French' : 'English'], ['Name', a.name], ['Email', a.email], ['Company', a.company], ['Phone', a.phone], ['Notes', a.notes],
+    ['Score', `${re.total}% (${re.band})`], ['Match', re.match.title], ['Report emailed', emailed ? 'Yes' : 'No'], ['Zoho CRM', crm || 'not sent'], ...summary(en)]
     .filter(([, v]) => v).map(([k, v]) => `<tr><td>${esc(k)}</td><td><b>${esc(v)}</b></td></tr>`).join('');
   try {
     await smtp(env, [notify], mime({
-      from, to: addr(notify), replyTo: addr(a.email, a.name), subject: `New health check: ${a.company || a.name} scored ${r.total}%`,
+      from, to: addr(notify), replyTo: addr(a.email, a.name), subject: `New health check${fr ? ' (FR)' : ''}: ${a.company || a.name} scored ${r.total}%`,
       html: `<table cellpadding="4">${rows}</table>`, pdf, pdfName
     }));
   } catch (err) { console.error(err); }

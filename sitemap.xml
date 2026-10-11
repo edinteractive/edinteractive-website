@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://edinteractive.digital/</loc><lastmod>2026-10-06</lastmod></url>
-  <url><loc>https://edinteractive.digital/health-check/</loc><lastmod>2026-10-10</lastmod></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://edinteractive.digital/</loc><lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://edinteractive.digital/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/"/></url>
+  <url><loc>https://edinteractive.digital/fr/</loc><lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://edinteractive.digital/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/"/></url>
+  <url><loc>https://edinteractive.digital/health-check/</loc><lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://edinteractive.digital/health-check/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/bilan-crm/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/health-check/"/></url>
+  <url><loc>https://edinteractive.digital/fr/bilan-crm/</loc><lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://edinteractive.digital/health-check/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/bilan-crm/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/health-check/"/></url>
 </urlset>

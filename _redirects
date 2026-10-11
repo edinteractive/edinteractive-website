@@ -5,3 +5,8 @@
 /home       /           301
 /wp-admin   /           301
 /wp-login.php /         301
+# French pages under their English names.
+/fr/health-check  /fr/bilan-crm/  301
+/fr/health-check/ /fr/bilan-crm/  301
+/fr/sample-report/ /fr/exemple-rapport/ 301
+/fr/booked/       /fr/reservation-confirmee/ 301

@@ -52,9 +52,17 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:col
 .btn-ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
 .nav .nav-consult{margin-right:-16px}
 @media (max-width:1060px){.nav ul{display:none}.nav .btn{margin-left:auto}.nav .btn+.btn{margin-left:0}}
-@media (max-width:480px){.nav .nav-consult{display:none}.nav .nav-consult+.btn{margin-left:auto}}
+@media (max-width:600px){.nav .nav-consult{display:none}.nav .nav-consult+.btn{margin-left:auto}}
 .nav .btn{white-space:nowrap}
 @media (max-width:420px){.nav .brand{font-size:0;gap:0}}
+/* Language switch (EN / FR), last item in the header. */
+.nav-lang{font:500 13px/1 var(--mono);letter-spacing:.08em;color:var(--muted);text-decoration:none;padding:10px 4px;margin-left:-12px}
+.nav-lang:hover{color:var(--ink)}
+@media (min-width:1061px){.nav .brand{white-space:nowrap;flex-shrink:0}}
+@media (max-width:360px){.nav{gap:10px}.nav .btn{padding:12px 14px}}
+@media (max-width:480px){.nav{gap:16px}.nav-lang{margin-left:-6px}}
+/* French labels run longer: drop the section links a little earlier. */
+@media (max-width:1180px){:lang(fr) .nav ul{display:none}:lang(fr) .nav .btn{margin-left:auto}:lang(fr) .nav .btn+.btn{margin-left:0}}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;padding-block:72px 64px}

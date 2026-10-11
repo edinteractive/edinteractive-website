@@ -3,6 +3,25 @@
 // Uses the built-in Helvetica fonts, which only cover Latin-1 text.
 import { summary, isNotZoho } from './hc-core.js';
 
+// Report wording by language (the answers and fixes arrive already worded by hc-core.js).
+const WORDS = {
+  en: { locale: 'en-CA', title: 'CRM health check report', for: 'PREPARED FOR', areas: 'Score by area', fixes: 'Fix these first',
+    none: 'Nothing urgent. The full audit will confirm it against your real data.', match: 'Your match', answers: 'Your answers',
+    nextH: 'Next step: the free full audit', pct: '%', slogan: 'B2B different, better, smarter.', sample: '/sample-report/',
+    nextNz: 'We review an export of your current CRM and accounting data, map what moving to Zoho would fix,',
+    nextZoho: 'We check your real CRM and Books data through the API, read-only,',
+    nextEnd: (site, path) => ' and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + path + '. To book your free 30-minute Zoho & AI strategy call, reply to our email.',
+    page: (i, n) => `Page ${i} of ${n}` },
+  fr: { locale: 'fr-CA', title: 'Rapport de bilan de santé CRM', for: 'PRÉPARÉ POUR', areas: 'Résultat par volet', fixes: 'À corriger en premier',
+    none: 'Rien d’urgent. L’audit complet le confirmera à partir de vos vraies données.', match: 'Votre spécialiste', answers: 'Vos réponses',
+    nextH: 'Prochaine étape : l’audit complet gratuit', pct: ' %', slogan: 'B2B différent, meilleur, plus futé.', sample: '/fr/exemple-rapport/',
+    nextNz: 'Nous passons en revue une exportation des données de votre CRM et de votre comptabilité actuels, montrons ce qu’un passage à Zoho réglerait',
+    nextZoho: 'Nous vérifions vos vraies données CRM et Books par l’API, en lecture seule,',
+    nextEnd: (site, path) => ' et vous envoyons une liste de correctifs classés selon les revenus que chacun peut rapporter. Voyez un exemple de rapport à ' + site + path + '. Pour réserver votre appel stratégique Zoho et IA gratuit de 30 minutes, répondez à notre courriel.',
+    page: (i, n) => `Page ${i} de ${n}` }
+};
+
+
 const W = 612, H = 792, M = 48; // US Letter, 48pt margins
 const C = {
   ink: [0.078, 0.082, 0.094], paper: [0.98, 0.973, 0.953], gold: [1, 0.761, 0.102], deep: [0.549, 0.396, 0],
@@ -11,7 +30,7 @@ const C = {
 
 // Helvetica advance widths (1/1000 em) for ASCII 32-126.
 const HELV = [278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584];
-const WIN = { '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97, '…': 0x85, '€': 0x80, ' ': 0x20, '→': 0x3e, '←': 0x3c };
+const WIN = { 'œ': 0x9c, 'Œ': 0x8c, '«': 0xab, '»': 0xbb, '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97, '…': 0x85, '€': 0x80, ' ': 0x20, '→': 0x3e, '←': 0x3c };
 
 // Unicode -> WinAnsi codes; anything outside Latin-1 becomes "?".
 function codes(str) {
@@ -64,6 +83,7 @@ const rgb = c => c.map(v => v.toFixed(3)).join(' ');
 
 // site is the host shown in the report, e.g. edinteractive.digital.
 export function buildPdf(a, r, date, site = 'edinteractive.digital') {
+  const t = WORDS[a.lang === 'fr' ? 'fr' : 'en'];
   const pages = [];
   let ops, y;
 
@@ -88,23 +108,23 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   // Header band.
   rect(0, H - 104, W, 104, C.ink);
   text(M, H - 42, 'ED Interactive Group', 11, true, C.gold);
-  right(W - M, H - 42, date.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' }), 10, false, C.line);
-  text(M, H - 78, 'CRM health check report', 26, true, C.white);
+  right(W - M, H - 42, date.toLocaleDateString(t.locale, { year: 'numeric', month: 'long', day: 'numeric' }), 10, false, C.line);
+  text(M, H - 78, t.title, 26, true, C.white);
   y = H - 104;
 
   // Who it's for.
-  y -= 30; text(M, y, 'PREPARED FOR', 8.5, false, C.muted);
+  y -= 30; text(M, y, t.for, 8.5, false, C.muted);
   y -= 4; para([a.name, a.company].filter(Boolean).join(', '), 14, true, C.ink, M, W - 2 * M, 1.3);
 
   // Score.
   y -= 62;
   text(M, y, String(r.total), 56, true, C.ink);
   const nx = M + width(String(r.total), 56, true);
-  text(nx, y, '%', 28, true, C.ink);
-  text(nx + width('%', 28, true) + 10, y + 4, r.band, 13, true, r.total >= 80 ? C.teal : C.deep);
+  text(nx, y, t.pct, 28, true, C.ink);
+  text(nx + width(t.pct, 28, true) + 10, y + 4, r.band, 13, true, r.total >= 80 ? C.teal : C.deep);
 
   // Areas.
-  heading('Score by area');
+  heading(t.areas);
   for (const x of r.areas) {
     need(34);
     y -= 22;
@@ -116,8 +136,8 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   }
 
   // Fixes.
-  heading('Fix these first');
-  const fixes = r.fixes.length ? r.fixes : ['Nothing urgent. The full audit will confirm it against your real data.'];
+  heading(t.fixes);
+  const fixes = r.fixes.length ? r.fixes : [t.none];
   fixes.forEach((f, i) => {
     const lines = wrap(f, 11, false, W - 2 * M - 28);
     need(lines.length * 15.4 + 8);
@@ -128,14 +148,14 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   });
 
   // Match.
-  heading('Your match');
+  heading(t.match);
   y -= 4;
   para(r.match.title, 12, true, C.ink);
   para(r.match.text, 10.5, false, C.muted);
   para(r.match.skills.join('  ·  '), 10, false, C.teal);
 
   // Answers.
-  heading('Your answers');
+  heading(t.answers);
   const colQ = 300, colA = W - 2 * M - colQ - 20;
   for (const [q, ans] of summary(a)) {
     const ql = wrap(q, 9.5, false, colQ), al = wrap(ans, 9.5, true, colA);
@@ -148,27 +168,27 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   }
 
   // Next step.
-  const next = (isNotZoho(a) ? 'We review an export of your current CRM and accounting data, map what moving to Zoho would fix,' : 'We check your real CRM and Books data through the API, read-only,') + ' and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute Zoho & AI strategy call, reply to our email.';
+  const next = (isNotZoho(a) ? t.nextNz : t.nextZoho) + t.nextEnd(site, t.sample);
   const nl = wrap(next, 10.5, false, W - 2 * M - 36);
   const boxH = 46 + nl.length * 15;
   need(boxH + 30);
   y -= 26 + boxH;
   rect(M, y, W - 2 * M, boxH, C.gold);
-  text(M + 18, y + boxH - 26, 'Next step: the free full audit', 13, true, C.ink);
+  text(M + 18, y + boxH - 26, t.nextH, 13, true, C.ink);
   nl.forEach((l, i) => text(M + 18, y + boxH - 46 - i * 15, l, 10.5, false, C.ink));
 
   // Footer on every page.
   pages.forEach((p, i) => {
     ops = p;
-    text(M, 28, 'ED Interactive Group  ·  B2B different, better, smarter.  ·  ' + site, 8, false, C.muted);
-    right(W - M, 28, `Page ${i + 1} of ${pages.length}`, 8, false, C.muted);
+    text(M, 28, 'ED Interactive Group  ·  ' + t.slogan + '  ·  ' + site, 8, false, C.muted);
+    right(W - M, 28, t.page(i + 1, pages.length), 8, false, C.muted);
   });
 
-  return assemble(pages.map(p => p.join('\n')));
+  return assemble(pages.map(p => p.join('\n')), t.title);
 }
 
 // Writes the PDF objects and cross-reference table. Every byte is Latin-1, so string length = byte length.
-function assemble(streams) {
+function assemble(streams, title) {
   const objs = [];
   const kids = streams.map((_, i) => `${5 + i * 2} 0 R`).join(' ');
   objs.push('<< /Type /Catalog /Pages 2 0 R >>');
@@ -179,7 +199,7 @@ function assemble(streams) {
     objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${6 + i * 2} 0 R >>`);
     objs.push(`<< /Length ${s.length} >>\nstream\n${s}\nendstream`);
   });
-  objs.push('<< /Title (CRM health check report) /Author (ED Interactive Group) /Producer (edinteractive.digital) >>');
+  objs.push('<< /Title ' + pdfString(title) + ' /Author (ED Interactive Group) /Producer (edinteractive.digital) >>');
   let out = '%PDF-1.4\n%âãÏÓ\n';
   const offsets = [];
   objs.forEach((o, i) => { offsets.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
