@@ -80,8 +80,11 @@ async function crmLead(a, r, emailed, site) {
   });
   const res = await fetch(WEB_TO_LEAD.url, { method: 'POST', body, redirect: 'manual' });
   const where = res.headers.get('Location') || '';
-  const text = (await res.text()).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  const detail = `Zoho CRM ${res.status} ${where} ${text}`.slice(0, 300);
+  // Zoho answers with an HTML thank-you page: drop its styles, scripts and comments, keep the words.
+  const text = (await res.text()).replace(/<(style|script)[\s\S]*?<\/\1>|<!--[\s\S]*?-->/gi, ' ')
+    .replace(/[^<>]*-->/g, ' ').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const ok = res.status < 400 && /submitted successfully/i.test(text);
+  const detail = ok ? `Zoho CRM: lead created (${res.status})` : `Zoho CRM ${res.status} ${where} ${text}`.slice(0, 300);
   console.log(detail);
   if (res.status >= 400) throw new Error(detail);
   return detail;
