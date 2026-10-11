@@ -128,7 +128,9 @@ section{padding-block:88px}
 /* pipeline */
 .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:s}
 .step{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);padding:22px;display:grid;gap:10px;align-content:start;position:relative}
-.step::before{counter-increment:s;content:"Step " counter(s);font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--signal)}
+/* Step labels: yellow tag with ink text (yellow text alone is unreadable on the light paper). */
+.step::before{counter-increment:s;content:"Step " counter(s);justify-self:start;font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;background:var(--gold);color:var(--on-gold);padding:5px 8px;border-radius:var(--radius-s)}
+:lang(fr) .step::before{content:"Étape " counter(s)}
 .step h3{font-size:22px;font-weight:600}
 .step p{color:var(--muted);font-size:15px}
 .step code{font:500 12px var(--mono);color:var(--ink);background:var(--paper);border-radius:4px;padding:2px 6px}
