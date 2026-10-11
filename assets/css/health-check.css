@@ -59,9 +59,9 @@ a.hc-chip:hover{border-color:var(--ink)}
 .hc-dot:nth-child(1)::before,.hc-dot:nth-child(5)::before{width:36px;height:36px}
 .hc-dot:nth-child(3)::before{width:24px;height:24px;margin-block:3px}
 .hc-dot:hover::before{border-color:var(--muted)}
-.hc-dot:has(input:checked)::before{border-color:var(--gold);transform:scale(1.08)}
-/* Selected: a gold tick inside the ring (a checklist mark, not a solid fill). */
-.hc-dot::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:13px;border:solid var(--gold);border-width:0 3px 3px 0;border-radius:1px;transform:translate(-50%,-62%) rotate(45deg) scale(0);transition:transform .14s ease-out;pointer-events:none}
+.hc-dot:has(input:checked)::before{border-color:var(--good);transform:scale(1.08)}
+/* Selected: a green tick (same as the site's list ticks) inside the ring (a checklist mark, not a solid fill). */
+.hc-dot::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:13px;border:solid var(--good);border-width:0 3px 3px 0;border-radius:1px;transform:translate(-50%,-62%) rotate(45deg) scale(0);transition:transform .14s ease-out;pointer-events:none}
 .hc-dot:nth-child(1)::after,.hc-dot:nth-child(5)::after{width:8px;height:15px}
 .hc-dot:nth-child(3)::after{width:6px;height:11px;border-width:0 2.5px 2.5px 0}
 .hc-dot:has(input:checked)::after{transform:translate(-50%,-62%) rotate(45deg) scale(1)}
@@ -73,8 +73,8 @@ a.hc-chip:hover{border-color:var(--ink)}
 .hc-opt-row{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-s);background:var(--paper);cursor:pointer;font-weight:400;font-size:15px}
 .hc-opt-row::before{content:"";flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}
 .hc-opt-row:has(input:checked){border-color:var(--ink);background:var(--signal-soft)}
-.hc-opt-row::after{content:"";position:absolute;left:24px;top:50%;width:5px;height:10px;border:solid var(--gold);border-width:0 2.5px 2.5px 0;transform:translate(-50%,-62%) rotate(45deg) scale(0);transition:transform .14s ease-out;pointer-events:none}
-.hc-opt-row:has(input:checked)::before{border-color:var(--gold)}
+.hc-opt-row::after{content:"";position:absolute;left:24px;top:50%;width:5px;height:10px;border:solid var(--good);border-width:0 2.5px 2.5px 0;transform:translate(-50%,-62%) rotate(45deg) scale(0);transition:transform .14s ease-out;pointer-events:none}
+.hc-opt-row:has(input:checked)::before{border-color:var(--good)}
 .hc-opt-row:has(input:checked)::after{transform:translate(-50%,-62%) rotate(45deg) scale(1)}
 
 /* Step 5: match + contact */

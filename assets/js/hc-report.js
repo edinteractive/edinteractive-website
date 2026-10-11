@@ -1,7 +1,7 @@
 // Builds the CRM health check report as a PDF (Uint8Array) with no dependencies,
 // so the same code runs in the browser (download) and in the Pages Function (email).
 // Uses the built-in Helvetica fonts, which only cover Latin-1 text.
-import { summary, isNotZoho } from './hc-model.js';
+import { summary, isNotZoho } from './hc-core.js';
 
 const W = 612, H = 792, M = 48; // US Letter, 48pt margins
 const C = {

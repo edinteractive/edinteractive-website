@@ -1,7 +1,7 @@
 // CRM health check: five short steps, an instant score on screen, and a PDF report.
 // The report function (/api/health-check) emails the same PDF and records the lead.
-import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, LIKERT_SCALE, POLLS, clean, validEmail, score, match, worded, auditLine } from './hc-model.js';
-import { buildPdf } from './hc-pdf.js';
+import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, LIKERT_SCALE, POLLS, clean, validEmail, score, match, worded, auditLine } from './hc-core.js';
+import { buildPdf } from './hc-report.js';
 
 const $ = id => document.getElementById(id);
 const form = $('hc-flow');
