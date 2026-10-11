@@ -36,3 +36,6 @@ li.open > .zb-ct-time {
 /* Email "Verify" link: inside the email box instead of hanging outside the card. */
 .label-container .zb-otp-verify-btn-inline { left: -58px !important; right: auto !important; top: 45px !important; font-weight: 600; }
 .label-container:has(.zb-otp-verify-btn-inline) input { padding-right: 66px !important; text-overflow: ellipsis; }
+/* Helper text under the open "business results" question (the form's only text box); Zoho has no help-text setting. */
+.bookings-field-theme > .label-container:has(textarea) > div:first-child::after { content: "Specify your ideal performance goal metrics, e.g. 5–10%+ ROI, 5–10%+ conversion lift, etc."; display: block; font-weight: 400; font-size: 13px; line-height: 1.4; color: #5F626A; margin-top: 4px; }
+.bookings-field-theme > .label-container textarea::placeholder { color: transparent; }
