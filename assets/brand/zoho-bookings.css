@@ -40,3 +40,5 @@ li.open > .zb-ct-time {
 .bookings-field-theme > .label-container .input-box:has(textarea) { position: relative !important; }
 .bookings-field-theme > .label-container .input-box:has(textarea:placeholder-shown)::before { content: "Specify your ideal performance goal metrics, e.g. 5–10%+ ROI, 5–10%+ conversion lift, etc."; position: absolute; left: 12px; right: 12px; top: 10px; font-size: 13px; line-height: 1.45; color: #8A8D94; pointer-events: none; z-index: 2; }
 .bookings-field-theme > .label-container textarea::placeholder { color: transparent; }
+/* French booking page (appel30min): the same hint in Quebec French. Zoho names the box after its label. */
+.bookings-field-theme > .label-container .input-box:has(textarea[name^="x_Quels"]:placeholder-shown)::before { content: "Précisez vos indicateurs de performance visés, p. ex. un RCI de 5 à 10 %+, une hausse de conversion de 5 à 10 %+, etc."; }
