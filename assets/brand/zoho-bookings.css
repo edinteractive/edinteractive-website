@@ -1,0 +1,19 @@
+/* ED Interactive: Zoho Bookings custom CSS (Booking Pages > Workspace Properties > Custom CSS).
+   Matches edinteractive.digital light palette: paper #FAF8F3, ink #141518, gold #FFC21A. */
+
+/* Selected time slot: ink instead of Zoho's muted purple. */
+.zb-ct-time-slot li.open .zb-ct-time,
+li.open > .zb-ct-time {
+  background: #141518 !important;
+  border-color: #141518 !important;
+  color: #FAF8F3 !important;
+}
+
+/* Today's date ring: gold instead of purple. */
+.zdatetimepicker--today { border-color: #FFC21A !important; }
+
+/* Initials tiles (workspace and services without a photo): gold with ink letters. */
+.zb-ad-icon[class*="color-"] {
+  background: #FFC21A !important;
+  color: #141518 !important;
+}
