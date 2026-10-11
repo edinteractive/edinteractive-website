@@ -6,7 +6,7 @@ export const ROLES = [
   { id: 'owner', title: 'Owner or general manager', text: "I run the business and can't get one trusted view of revenue, pipeline and margin.", match: 'analytics' },
   { id: 'sales', title: 'Sales or marketing lead', text: 'My team lives in the CRM, but duplicates, stale deals and guesswork forecasts slow us down.', match: 'workflow' },
   { id: 'ops', title: 'Operations or finance lead', text: 'I keep the CRM and accounting in sync by hand and want the manual steps automated.', match: 'automation' },
-  { id: 'other', title: 'Something else', text: 'IT, consultant or not sure yet.', match: 'data' }
+  { id: 'other', title: 'Something else', text: 'IT consultant, digital strategist, management consultant, forward deployed engineer (FDE), etc.', match: 'data' }
 ];
 
 export const PAINS = [
