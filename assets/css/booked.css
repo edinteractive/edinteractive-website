@@ -19,7 +19,7 @@
 .bk-next ol{list-style:none;counter-reset:bk;margin:20px 0 0;padding:0;display:grid;gap:16px}
 .bk-next li{counter-increment:bk;position:relative;padding-left:48px;color:var(--muted)}
 .bk-next li b{color:var(--ink);font-weight:600}
-.bk-next li::before{content:counter(bk);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--gold);color:var(--gold);font:600 14px/30px var(--mono);text-align:center}
+.bk-next li::before{content:counter(bk);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--signal);font:600 14px/30px var(--mono);text-align:center}
 
 .bk-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px}
 
