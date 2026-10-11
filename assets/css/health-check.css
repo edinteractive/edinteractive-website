@@ -105,3 +105,13 @@ a.hc-chip:hover{border-color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.hc-dot::before,.hc-dot::after,.hc-opt-row::after{transition:none}.hc-flash{animation:none}}
 .hc-ts{margin:12px 0 4px}.hc-ts:empty{display:none}
 .score .num .pct{font-size:.55em;margin-left:2px;letter-spacing:0}
+/* Unanswered after Continue: soft gold shading (the site's "needs attention" colour; green means done). */
+.hc-scale.hc-missing,.hc-poll.hc-missing{background:var(--signal-soft);box-shadow:inset 3px 0 0 var(--signal);margin-inline:-16px;padding-inline:16px;border-radius:var(--radius-m);border-bottom-color:transparent;transition:background .2s}
+.hc-roles.hc-missing .hc-role{border-color:var(--signal);background:var(--signal-soft)}
+label.hc-missing input{border-color:var(--signal);background:var(--signal-soft)}
+.hc-scale,.hc-poll{scroll-margin-top:96px}
+/* Floated legends sit inside the fieldset box, so the shading covers the question text too. */
+.hc-scale legend,.hc-poll legend{float:left;width:100%}
+.hc-scale legend+*{clear:both}
+.hc-scale.hc-missing,.hc-poll.hc-missing{padding-top:14px}
+@media (prefers-reduced-motion:reduce){.hc-scale.hc-missing,.hc-poll.hc-missing{transition:none}}
