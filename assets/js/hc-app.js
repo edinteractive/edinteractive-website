@@ -1,16 +1,48 @@
 // CRM health check: five short steps, an instant score on screen, and a PDF report.
 // The report function (/api/health-check) emails the same PDF and records the lead.
-import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, LIKERT_SCALE, POLLS, clean, validEmail, score, match, worded, auditLine } from './hc-core.js';
+import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, POLLS, clean, validEmail, score, match, worded, auditLine, langOf, label, likert } from './hc-core.js';
 import { buildPdf } from './hc-report.js';
 
 const $ = id => document.getElementById(id);
+// The page's own language (<html lang="fr-CA"> on /fr/bilan-crm/) picks the wording.
+const L = langOf(document.documentElement.lang);
+const UI = {
+  en: {
+    tsError: "Our security check couldn't verify this browser. Try again, turn off a VPN or ad blocker, or email david@edinteractive.digital and we'll run the health check with you.",
+    choose: 'Choose one', role: 'Pick the option that sounds most like you.',
+    rate: left => `Rate ${left === 1 ? 'the last statement' : 'the remaining ' + left + ' statements'} to continue.`,
+    polls: 'Answer all three polls to continue.', name: 'Please add your name.', email: 'Please add a valid work email.',
+    submit: 'Request my health check', next: 'Continue →', focus: 'Health check focus: ',
+    tsWait: 'One moment: the security check is still running. Try again in a few seconds.', building: 'Building your report…',
+    sending: e => 'Sending your report to ' + e + '…', sent: e => 'Great, thank you! Your PDF report is on its way to ' + e + '.',
+    saved: 'Thank you. Download your PDF report below. We have your answers and will follow up by email.',
+    blocked: 'Download your PDF report below. We could not verify the request, so it was not sent or saved. Please reload and try again.',
+    failed: 'Thank you. Download your PDF report below. We could not send it by email just now.',
+    none: 'Nothing urgent. The full audit will confirm it against your real data.', basis: 'Based on your answers only. ',
+    pdf: 'crm-health-check', fab: '/sample-report/', train: '/sample-report/training/'
+  },
+  fr: {
+    tsError: 'Notre vérification de sécurité n’a pas pu valider ce navigateur. Réessayez, désactivez votre RPV ou votre bloqueur de publicité, ou écrivez à david@edinteractive.digital et nous ferons le bilan avec vous.',
+    choose: 'Choisissez', role: 'Choisissez l’option qui vous ressemble le plus.',
+    rate: left => left === 1 ? 'Évaluez le dernier énoncé pour continuer.' : `Évaluez les ${left} énoncés restants pour continuer.`,
+    polls: 'Répondez aux trois sondages pour continuer.', name: 'Veuillez indiquer votre nom.', email: 'Veuillez indiquer un courriel professionnel valide.',
+    submit: 'Recevoir mon bilan', next: 'Continuer →', focus: 'Points à examiner : ',
+    tsWait: 'Un instant : la vérification de sécurité est en cours. Réessayez dans quelques secondes.', building: 'Préparation de votre rapport…',
+    sending: e => 'Envoi de votre rapport à ' + e + '…', sent: e => 'Merci! Votre rapport PDF est en route vers ' + e + '.',
+    saved: 'Merci. Téléchargez votre rapport PDF ci-dessous. Nous avons bien reçu vos réponses et ferons un suivi par courriel.',
+    blocked: 'Téléchargez votre rapport PDF ci-dessous. Nous n’avons pas pu valider la demande; elle n’a donc été ni envoyée ni enregistrée. Rechargez la page et réessayez.',
+    failed: 'Merci. Téléchargez votre rapport PDF ci-dessous. Nous n’avons pas pu l’envoyer par courriel pour l’instant.',
+    none: 'Rien d’urgent. L’audit complet le confirmera à partir de vos vraies données.', basis: 'Selon vos réponses seulement. ',
+    pdf: 'bilan-crm', fab: '/fr/exemple-rapport/', train: '/fr/exemple-rapport/formation/'
+  }
+}[L];
 const form = $('hc-flow');
 const steps = [...form.querySelectorAll('.hc-step')];
 const marks = [...form.querySelectorAll('.hc-steps li')];
 const warn = $('hc-warn');
 let at = 0;
 let pdfBytes = null;
-let pdfName = 'crm-health-check.pdf';
+let pdfName = UI.pdf + '.pdf';
 
 // Cloudflare Turnstile bot check, loaded only when the contact step opens.
 const siteKey = (document.querySelector('meta[name=turnstile-sitekey]') || {}).content || '';
@@ -20,12 +52,12 @@ function loadTurnstile() {
   if (!siteKey || tsWidget !== null || document.getElementById('hc-ts-js')) return;
   window.hcTurnstileReady = () => {
     tsWidget = window.turnstile.render('#hc-ts', {
-      sitekey: siteKey, action: 'health-check', size: 'flexible', 'retry-interval': 4000,
+      sitekey: siteKey, action: 'health-check', size: 'flexible', language: L === 'fr' ? 'fr' : 'auto', 'retry-interval': 4000,
       callback: () => { if (!warn.hidden) warn.hidden = true; },
       // A failed check (some VPNs, privacy extensions, automated browsers) shouldn't leave the visitor guessing.
       'error-callback': code => {
         tsFailed = true;
-        warn.textContent = "Our security check couldn't verify this browser. Try again, turn off a VPN or ad blocker, or email david@edinteractive.digital and we'll run the health check with you.";
+        warn.textContent = UI.tsError;
         warn.hidden = false;
         console.warn('Turnstile error', code);
         return true; // handled: no uncaught error in the console
@@ -57,7 +89,8 @@ function choice(type, name, value, labelCls) {
 }
 
 // Step 1: role cards.
-for (const r of ROLES) {
+for (const role of ROLES) {
+  const r = worded('roles', role, false, L);
   const [lab] = choice('radio', 'role', r.id, 'hc-role' + (r.id === 'other' ? ' hc-role-else' : ''));
   lab.appendChild(el('b', null, r.title));
   lab.appendChild(el('span', null, r.text));
@@ -67,7 +100,7 @@ for (const r of ROLES) {
 // Step 2: pain chips (max three), app chips, team size.
 for (const p of PAINS) {
   const [lab] = choice('checkbox', 'pains', p.id, 'hc-chip');
-  lab.appendChild(el('span', 'hc-pain-t', p.label));
+  lab.appendChild(el('span', 'hc-pain-t', worded('pains', p, false, L).label));
   lab.dataset.id = p.id;
   $('hc-pains').appendChild(lab);
 }
@@ -77,7 +110,7 @@ $('hc-pains').addEventListener('change', e => {
 });
 function chip(box, name, value) {
   const [lab, input] = choice('checkbox', name, value, 'hc-chip');
-  lab.appendChild(el('span', null, value));
+  lab.appendChild(el('span', null, label(value, L)));
   $(box).appendChild(lab);
   return input;
 }
@@ -93,8 +126,8 @@ function syncZoho() {
   if (off) $('hc-apps-other').value = '';
   $('hc-crm-wrap').hidden = !off;
   // Visitors not on Zoho see the same questions worded for the CRM and accounting they use today.
-  for (const lab of $('hc-pains').children) lab.querySelector('.hc-pain-t').textContent = worded('pains', PAINS.find(p => p.id === lab.dataset.id), off).label;
-  for (const s of STATEMENTS) $('hc-st-' + s.id).textContent = worded('statements', s, off).text;
+  for (const lab of $('hc-pains').children) lab.querySelector('.hc-pain-t').textContent = worded('pains', PAINS.find(p => p.id === lab.dataset.id), off, L).label;
+  for (const s of STATEMENTS) $('hc-st-' + s.id).textContent = worded('statements', s, off, L).text;
   if (!off) {
     for (const box of $('hc-crms').querySelectorAll('input')) box.checked = false;
     $('hc-crm-other').value = '';
@@ -111,18 +144,19 @@ notZoho.addEventListener('change', syncZoho);
 $('hc-apps').addEventListener('change', syncNotZoho);
 $('hc-apps-other').addEventListener('input', syncNotZoho);
 const users = $('hc-users');
-users.appendChild(new Option('Choose one', ''));
+users.appendChild(new Option(UI.choose, ''));
 for (const u of CRM_USERS) users.appendChild(new Option(u, u));
 
 // Step 3: Likert scales.
+const SCALE = likert(L);
 STATEMENTS.forEach((s, i) => {
   const fs = el('fieldset', 'hc-scale');
   const lg = el('legend');
   lg.appendChild(el('span', 'hc-n', String(i + 1).padStart(2, '0')));
-  lg.appendChild(el('span', null, s.text)).id = 'hc-st-' + s.id;
+  lg.appendChild(el('span', null, worded('statements', s, false, L).text)).id = 'hc-st-' + s.id;
   fs.appendChild(lg);
   const row = el('div', 'hc-dots');
-  LIKERT_SCALE.forEach((word, v) => {
+  SCALE.forEach((word, v) => {
     const [lab] = choice('radio', 'lk-' + s.id, String(v + 1), 'hc-dot');
     lab.appendChild(el('span', 'hc-sr', word));
     lab.title = word;
@@ -130,14 +164,15 @@ STATEMENTS.forEach((s, i) => {
   });
   fs.appendChild(row);
   const ends = el('div', 'hc-ends');
-  ends.appendChild(el('span', null, LIKERT_SCALE[0]));
-  ends.appendChild(el('span', null, LIKERT_SCALE[4]));
+  ends.appendChild(el('span', null, SCALE[0]));
+  ends.appendChild(el('span', null, SCALE[4]));
   fs.appendChild(ends);
   $('hc-likert').appendChild(fs);
 });
 
 // Step 4: polls.
-for (const p of POLLS) {
+for (const poll of POLLS) {
+  const p = worded('polls', poll, false, L);
   const fs = el('fieldset', 'hc-poll');
   fs.appendChild(el('legend', null, p.q));
   p.options.forEach(([label], i) => {
@@ -156,7 +191,7 @@ function answers() {
   for (const s of STATEMENTS) likert[s.id] = Number(picked('lk-' + s.id)[0]);
   for (const p of POLLS) { const v = picked('poll-' + p.id)[0]; polls[p.id] = v == null ? NaN : Number(v); }
   return {
-    role: picked('role')[0], pains: picked('pains'), apps: picked('apps'), appsOther: $('hc-apps-other').value,
+    lang: L, role: picked('role')[0], pains: picked('pains'), apps: picked('apps'), appsOther: $('hc-apps-other').value,
     crms: picked('crms'), crmOther: $('hc-crm-other').value,
     users: users.value, likert, polls,
     name: $('hc-name').value, email: $('hc-email').value, company: $('hc-company').value,
@@ -165,15 +200,15 @@ function answers() {
 }
 
 function problem(step) {
-  if (step === 0 && !picked('role').length) return 'Pick the option that sounds most like you.';
+  if (step === 0 && !picked('role').length) return UI.role;
   if (step === 2) {
     const left = STATEMENTS.filter(s => !picked('lk-' + s.id).length).length;
-    if (left) return `Rate ${left === 1 ? 'the last statement' : 'the remaining ' + left + ' statements'} to continue.`;
+    if (left) return UI.rate(left);
   }
-  if (step === 3 && POLLS.some(p => !picked('poll-' + p.id).length)) return 'Answer all three polls to continue.';
+  if (step === 3 && POLLS.some(p => !picked('poll-' + p.id).length)) return UI.polls;
   if (step === 4) {
-    if (!$('hc-name').value.trim()) return 'Please add your name.';
-    if (!validEmail($('hc-email').value.trim())) return 'Please add a valid work email.';
+    if (!$('hc-name').value.trim()) return UI.name;
+    if (!validEmail($('hc-email').value.trim())) return UI.email;
   }
   return '';
 }
@@ -187,7 +222,7 @@ function show(step) {
     if (i === step) m.setAttribute('aria-current', 'step'); else m.removeAttribute('aria-current');
   });
   $('hc-back').hidden = step === 0;
-  $('hc-next').textContent = step === steps.length - 1 ? 'Request my health check' : 'Continue →';
+  $('hc-next').textContent = step === steps.length - 1 ? UI.submit : UI.next;
   $('hc-fine').hidden = step !== steps.length - 1;
   warn.hidden = true;
   if (step === 4) loadTurnstile();
@@ -201,8 +236,8 @@ function renderMatch(box, m) {
   const ul = el('ul', 'checks');
   for (const s of m.skills) ul.appendChild(el('li', null, s));
   box.appendChild(ul);
-  const pains = picked('pains').map(id => worded('pains', PAINS.find(p => p.id === id), notZoho.checked).label);
-  if (pains.length) box.appendChild(el('p', 'hc-focus', 'Health check focus: ' + pains.join(', ')));
+  const pains = picked('pains').map(id => worded('pains', PAINS.find(p => p.id === id), notZoho.checked, L).label);
+  if (pains.length) box.appendChild(el('p', 'hc-focus', UI.focus + pains.join(', ')));
 }
 
 form.addEventListener('change', () => { if (!warn.hidden && !problem(at)) warn.hidden = true; });
@@ -224,34 +259,34 @@ async function finish() {
   raw.turnstile = tsToken();
   if (siteKey && !raw.turnstile) {
     if (tsFailed && window.turnstile) { tsFailed = false; window.turnstile.reset(tsWidget); }
-    warn.textContent = 'One moment: the security check is still running. Try again in a few seconds.';
+    warn.textContent = UI.tsWait;
     warn.hidden = false;
     return;
   }
   const next = $('hc-next');
-  next.disabled = true; next.textContent = 'Building your report…';
+  next.disabled = true; next.textContent = UI.building;
 
   const result = score(a);
   pdfBytes = buildPdf(a, result, new Date(), location.host);
   const slug = (a.company || a.name).normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
-  pdfName = slug ? 'crm-health-check-' + slug + '.pdf' : 'crm-health-check.pdf';
+  pdfName = slug ? UI.pdf + '-' + slug + '.pdf' : UI.pdf + '.pdf';
   renderResult(a, result);
 
   const sent = $('hc-sent');
-  sent.textContent = 'Sending your report to ' + a.email + '…';
+  sent.textContent = UI.sending(a.email);
   try {
     const res = await fetch('/api/health-check', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(raw)
     });
     const out = await res.json().catch(() => ({}));
     sent.textContent = out.emailed
-      ? 'Great, thank you! Your PDF report is on its way to ' + a.email + '.'
-      : 'Thank you. Download your PDF report below. We have your answers and will follow up by email.';
+      ? UI.sent(a.email)
+      : UI.saved;
     if (location.hostname.endsWith('.pages.dev') && out.crm) $('hc-sent').textContent += ' [test: ' + out.crm + ']'; // previews only
-    if (res.status === 403) sent.textContent = 'Download your PDF report below. We could not verify the request, so it was not sent or saved. Please reload and try again.';
-    else if (!res.ok && !out.emailed) sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
+    if (res.status === 403) sent.textContent = UI.blocked;
+    else if (!res.ok && !out.emailed) sent.textContent = UI.failed;
   } catch {
-    sent.textContent = 'Thank you. Download your PDF report below. We could not send it by email just now.';
+    sent.textContent = UI.failed;
   }
 }
 
@@ -264,7 +299,7 @@ function renderResult(a, r) {
   for (const x of r.areas) {
     const row = el('div', 'row');
     row.appendChild(el('span', null, x.label));
-    row.appendChild(el('span', 'v', x.pct + '%'));
+    row.appendChild(el('span', 'v', x.pct + (L === 'fr' ? '\u00a0%' : '%')));
     const bar = el('span', 'bar');
     const fill = el('i', x.pct >= 75 ? 'ok' : x.pct >= 50 ? 'mid' : 'low');
     fill.style.width = Math.max(x.pct, 3) + '%';
@@ -273,12 +308,12 @@ function renderResult(a, r) {
   const list = $('hc-fixes');
   list.textContent = '';
   for (const f of r.fixes) list.appendChild(el('li', null, f));
-  if (!r.fixes.length) list.appendChild(el('li', null, 'Nothing urgent. The full audit will confirm it against your real data.'));
+  if (!r.fixes.length) list.appendChild(el('li', null, UI.none));
   renderMatch($('hc-match-2'), r.match);
-  $('hc-foot').textContent = 'Based on your answers only. ' + auditLine(a);
+  $('hc-foot').textContent = UI.basis + auditLine(a);
   const q = a.company ? '?company=' + encodeURIComponent(a.company.slice(0, 60)) : '';
-  $('hc-s-fab').href = '/sample-report/' + q;
-  $('hc-s-train').href = '/sample-report/training/' + q;
+  $('hc-s-fab').href = UI.fab + q;
+  $('hc-s-train').href = UI.train + q;
 
   form.hidden = true;
   const box = $('hc-result');

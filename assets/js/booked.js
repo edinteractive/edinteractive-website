@@ -23,7 +23,7 @@
   const start = new Date(pick('booking_start_time'));
   if (!isNaN(start)) {
     try {
-      when = start.toLocaleString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+      when = start.toLocaleString(document.documentElement.lang || undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
       tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
     } catch (e) { when = start.toString(); }
   } else {

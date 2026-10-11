@@ -1,4 +1,5 @@
 // Homepage health check form: opens the full health check with name, email and apps filled in.
+// The form's data-target is the health check page in the page's language (/fr/bilan-crm/ in French).
 document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('hc-form');
   if (!form) return;
@@ -22,6 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var other = document.getElementById('hc-other');
     if (apps && apps.value === 'Other' && other.value.trim()) q.set('other', other.value.trim());
     var qs = q.toString();
-    location.href = '/health-check/' + (qs ? '?' + qs : '');
+    location.href = (form.dataset.target || '/health-check/') + (qs ? '?' + qs : '');
   });
 });

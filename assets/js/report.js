@@ -5,8 +5,11 @@ document.addEventListener('DOMContentLoaded', function () {
   if (company) {
     document.querySelectorAll('[data-company],[data-company-full]').forEach(function (el) { el.textContent = company; });
     var banner = document.querySelector('[data-banner]');
-    if (banner) banner.textContent = 'This example shows the kind of report ' + company + ' would get. The figures are illustrative until we run the full audit on your own Zoho data.';
-    document.title = company + ': sample CRM audit report | ED Interactive Group';
+    var fr = document.documentElement.lang.indexOf('fr') === 0;
+    if (banner) banner.textContent = fr
+      ? 'Cet exemple montre le genre de rapport que recevrait ' + company + '. Les chiffres sont illustratifs jusqu’à ce que nous fassions l’audit complet sur vos propres données Zoho.'
+      : 'This example shows the kind of report ' + company + ' would get. The figures are illustrative until we run the full audit on your own Zoho data.';
+    document.title = company + (fr ? ' : exemple de rapport d’audit CRM | ED Interactive Group' : ': sample CRM audit report | ED Interactive Group');
   }
   document.querySelectorAll('.r-switch a').forEach(function (a) {
     if (company) a.href = a.getAttribute('href') + '?company=' + encodeURIComponent(company);
