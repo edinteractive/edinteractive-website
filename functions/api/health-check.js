@@ -69,7 +69,7 @@ async function crmLead(a, r, emailed, site) {
   const parts = a.name.trim().split(/\s+/);
   const last = parts.length > 1 ? parts.pop() : parts[0];
   const first = parts.length && last !== parts[0] ? parts.join(' ') : last; // the form requires both names
-  const desc = [`CRM health check score: ${r.total}/100 (${r.band})`, `Match: ${r.match.title}`,
+  const desc = [`CRM health check score: ${r.total}% (${r.band})`, `Match: ${r.match.title}`,
     `Report emailed: ${emailed ? 'yes' : 'no'}`, '', 'Fix these first:', ...r.fixes.map((f, i) => `${i + 1}. ${f}`), '',
     ...summary(a).map(([q, v]) => `${q}: ${v}`), ...(a.notes ? ['', 'Notes: ' + a.notes] : [])].join('\n');
   const body = new URLSearchParams({
@@ -174,14 +174,14 @@ export async function onRequestPost({ request, env }) {
   const first = a.name.split(/\s+/)[0];
   const fixes = r.fixes.map(f => `<li>${esc(f)}</li>`).join('');
   const prospectHtml = `<p>Hi ${esc(first)},</p>
-<p>Thanks for taking the CRM health check. Your score is <b>${r.total}/100</b>: ${esc(r.band)}</p>
+<p>Thanks for taking the CRM health check. Your score is <b>${r.total}%</b>: ${esc(r.band)}</p>
 ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
 <p>Your full report is attached as a PDF. The next step is a free full audit. ${esc(auditLine(a))} <a href="${origin}/sample-report/">See a sample report</a>, then just reply to this email to book a time.</p>
 <p>ED Interactive Group<br>B2B different, better, smarter.</p>`;
 
   if (human) try {
     await smtp(env, [a.email], mime({
-      from, to: addr(a.email, a.name), replyTo: addr(notify), subject: `Your CRM health check: ${r.total}/100`,
+      from, to: addr(a.email, a.name), replyTo: addr(notify), subject: `Your CRM health check: ${r.total}%`,
       html: prospectHtml, pdf, pdfName
     }));
     emailed = true;
@@ -189,11 +189,11 @@ ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
 
   const crm = await lead();
   const rows = [['Name', a.name], ['Email', a.email], ['Company', a.company], ['Phone', a.phone], ['Notes', a.notes],
-    ['Score', `${r.total}/100 (${r.band})`], ['Match', r.match.title], ['Report emailed', emailed ? 'Yes' : 'No'], ['Zoho CRM', crm || 'not sent'], ...summary(a)]
+    ['Score', `${r.total}% (${r.band})`], ['Match', r.match.title], ['Report emailed', emailed ? 'Yes' : 'No'], ['Zoho CRM', crm || 'not sent'], ...summary(a)]
     .filter(([, v]) => v).map(([k, v]) => `<tr><td>${esc(k)}</td><td><b>${esc(v)}</b></td></tr>`).join('');
   try {
     await smtp(env, [notify], mime({
-      from, to: addr(notify), replyTo: addr(a.email, a.name), subject: `New health check: ${a.company || a.name} scored ${r.total}/100`,
+      from, to: addr(notify), replyTo: addr(a.email, a.name), subject: `New health check: ${a.company || a.name} scored ${r.total}%`,
       html: `<table cellpadding="4">${rows}</table>`, pdf, pdfName
     }));
   } catch (err) { console.error(err); }
