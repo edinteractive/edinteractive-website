@@ -99,8 +99,17 @@ function syncZoho() {
     for (const box of $('hc-crms').querySelectorAll('input')) box.checked = false;
     $('hc-crm-other').value = '';
   }
+  syncNotZoho();
+}
+// The other way round: once a Zoho app is picked (or typed in), "Not on Zoho yet" can't be.
+function syncNotZoho() {
+  const usesZoho = !!$('hc-apps').querySelector('input:checked') || !!$('hc-apps-other').value.trim();
+  notZoho.disabled = usesZoho && !notZoho.checked;
+  $('hc-nozoho').classList.toggle('hc-off', notZoho.disabled);
 }
 notZoho.addEventListener('change', syncZoho);
+$('hc-apps').addEventListener('change', syncNotZoho);
+$('hc-apps-other').addEventListener('input', syncNotZoho);
 const users = $('hc-users');
 users.appendChild(new Option('Choose one', ''));
 for (const u of CRM_USERS) users.appendChild(new Option(u, u));
