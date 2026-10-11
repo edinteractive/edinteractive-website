@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://edinteractivegroup.com/sitemap.xml
+Sitemap: https://edinteractive.digital/sitemap.xml

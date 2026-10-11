@@ -1,7 +1,7 @@
 // Builds the CRM health check report as a PDF (Uint8Array) with no dependencies,
 // so the same code runs in the browser (download) and in the Pages Function (email).
 // Uses the built-in Helvetica fonts, which only cover Latin-1 text.
-import { summary } from './hc-model.js';
+import { summary, isNotZoho } from './hc-model.js';
 
 const W = 612, H = 792, M = 48; // US Letter, 48pt margins
 const C = {
@@ -43,7 +43,15 @@ function wrap(str, size, bold, max) {
   const lines = [];
   for (const para of String(str).split('\n')) {
     let line = '';
-    for (const word of para.split(/\s+/).filter(Boolean)) {
+    for (let word of para.split(/\s+/).filter(Boolean)) {
+      // A word wider than the column (a URL, "Desk,Inventory,SalesIQ") is split so it can't run off the page.
+      while (width(word, size, bold) > max && word.length > 1) {
+        let n = word.length - 1;
+        while (n > 1 && width(word.slice(0, n), size, bold) > max) n--;
+        if (line) { lines.push(line); line = ''; }
+        lines.push(word.slice(0, n));
+        word = word.slice(n);
+      }
       const next = line ? line + ' ' + word : word;
       if (width(next, size, bold) <= max || !line) line = next;
       else { lines.push(line); line = word; }
@@ -55,7 +63,7 @@ function wrap(str, size, bold, max) {
 const rgb = c => c.map(v => v.toFixed(3)).join(' ');
 
 // site is the host shown in the report, e.g. edinteractive.digital.
-export function buildPdf(a, r, date, site = 'edinteractivegroup.com') {
+export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   const pages = [];
   let ops, y;
 
@@ -86,14 +94,14 @@ export function buildPdf(a, r, date, site = 'edinteractivegroup.com') {
 
   // Who it's for.
   y -= 30; text(M, y, 'PREPARED FOR', 8.5, false, C.muted);
-  y -= 18; text(M, y, [a.name, a.company].filter(Boolean).join(', '), 14, true, C.ink);
+  y -= 4; para([a.name, a.company].filter(Boolean).join(', '), 14, true, C.ink, M, W - 2 * M, 1.3);
 
   // Score.
   y -= 62;
   text(M, y, String(r.total), 56, true, C.ink);
   const nx = M + width(String(r.total), 56, true) + 8;
   text(nx, y + 22, '/100', 13, false, C.muted);
-  text(nx, y + 4, r.band, 13, true, r.total >= 75 ? C.teal : C.deep);
+  text(nx, y + 4, r.band, 13, true, r.total >= 80 ? C.teal : C.deep);
 
   // Areas.
   heading('Score by area');
@@ -140,7 +148,7 @@ export function buildPdf(a, r, date, site = 'edinteractivegroup.com') {
   }
 
   // Next step.
-  const next = 'We check your real CRM and Books data through the API, read-only, and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute walkthrough, reply to our email.';
+  const next = (isNotZoho(a) ? 'We review an export of your current CRM and accounting data, map what moving to Zoho would fix,' : 'We check your real CRM and Books data through the API, read-only,') + ' and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute walkthrough, reply to our email.';
   const nl = wrap(next, 10.5, false, W - 2 * M - 36);
   const boxH = 46 + nl.length * 15;
   need(boxH + 30);
@@ -171,7 +179,7 @@ function assemble(streams) {
     objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${6 + i * 2} 0 R >>`);
     objs.push(`<< /Length ${s.length} >>\nstream\n${s}\nendstream`);
   });
-  objs.push('<< /Title (CRM health check report) /Author (ED Interactive Group) /Producer (edinteractivegroup.com) >>');
+  objs.push('<< /Title (CRM health check report) /Author (ED Interactive Group) /Producer (edinteractive.digital) >>');
   let out = '%PDF-1.4\n%âãÏÓ\n';
   const offsets = [];
   objs.forEach((o, i) => { offsets.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });

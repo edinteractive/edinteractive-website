@@ -5,7 +5,7 @@
 export const ROLES = [
   { id: 'owner', title: 'Owner or general manager', text: "I run the business and can't get one trusted view of revenue, pipeline and margin.", match: 'analytics' },
   { id: 'sales', title: 'Sales or marketing lead', text: 'My team lives in the CRM, but duplicates, stale deals and guesswork forecasts slow us down.', match: 'workflow' },
-  { id: 'ops', title: 'Operations or finance lead', text: 'I keep CRM and Books in sync by hand and want the manual steps automated.', match: 'automation' },
+  { id: 'ops', title: 'Operations or finance lead', text: 'I keep the CRM and accounting in sync by hand and want the manual steps automated.', match: 'automation' },
   { id: 'other', title: 'Something else', text: 'IT, consultant or not sure yet.', match: 'data' }
 ];
 
@@ -75,6 +75,47 @@ export const PRACTITIONERS = {
     skills: ['Pipeline stages', 'Lead routing', 'Personalized follow-ups'] }
 };
 
+// "Not on Zoho yet" visitors: the same questions and scoring, worded for whatever CRM and
+// accounting they use today. Anything not listed here is already tool-neutral.
+const NZ = {
+  pains: {
+    sync: 'CRM and accounting out of sync',
+    creator: 'Spreadsheets or homegrown tools holding it together'
+  },
+  statements: {
+    books: { text: 'Our CRM and accounting system agree on customers, orders and invoices.',
+      fix: 'Connect your CRM and accounting so customers, invoices and deals line up in one view. On Zoho, that is CRM linked to Books.' },
+    trust: { fix: 'Build one dashboard from your CRM and accounting data that the team reviews every week.' }
+  },
+  polls: {
+    hours: { fix: 'Connect your CRM and accounting so data is entered once, not re-keyed between apps.' }
+  },
+  practitioners: {
+    data: { title: 'CRM Data and Migration Specialist', text: 'Cleans and de-duplicates your data before it moves into Zoho CRM, then sets the rules that keep it clean.',
+      skills: ['Cleanup before migration', 'Duplicate merge and prevention', 'Field mapping into Zoho CRM'] },
+    analytics: { title: 'Reporting and Analytics Consultant', text: 'Brings your CRM and accounting data into one trusted dashboard for revenue, pipeline and margin.',
+      skills: ['Zoho Analytics', 'Margin and job-cost reporting', 'Forecast dashboards'] },
+    automation: { title: 'Automation and Integration Developer', text: 'Connects your CRM and accounting so the double entry and hand-offs disappear, today or after a move to Zoho.',
+      skills: ['CRM and accounting integration', 'Workflow automation', 'Migration to Zoho One'] },
+    workflow: { text: 'Tightens your pipeline stages, lead routing and personalized follow-ups so deals stop going quiet, in your current CRM or in Zoho.' }
+  }
+};
+
+export const isNotZoho = a => Array.isArray(a && a.apps) && a.apps.includes(NOT_ZOHO);
+// The wording to show for a pain, statement, poll or practitioner: the Zoho original, or the
+// tool-neutral version for a visitor who is not on Zoho yet.
+export function worded(kind, item, nz) {
+  const alt = nz && NZ[kind] && NZ[kind][item.id];
+  if (!alt) return item;
+  return typeof alt === 'string' ? { ...item, label: alt } : { ...item, ...alt };
+}
+// One line on what the free full audit looks at.
+export function auditLine(a) {
+  return isNotZoho(a)
+    ? 'The full audit reviews an export of your current CRM and accounting data and maps what moving to Zoho would fix.'
+    : 'The full audit checks your real CRM and Books data through the API, read-only.';
+}
+
 const LIMIT = { name: 120, email: 200, company: 160, phone: 40, notes: 1500, other: 160 };
 
 function clip(v, n) { return String(v == null ? '' : v).trim().slice(0, n); }
@@ -106,6 +147,9 @@ export function clean(raw) {
     name: clip(raw.name, LIMIT.name), email: clip(raw.email, LIMIT.email).toLowerCase(),
     company: clip(raw.company, LIMIT.company), phone: clip(raw.phone, LIMIT.phone), notes: clip(raw.notes, LIMIT.notes)
   };
+  // Name and company go into the email and PDF, so links are kept out ("Acme.com Inc" is still fine).
+  if (/https?:|www\./i.test(contact.name + ' ' + contact.company))
+    return { error: 'Please leave links out of your name and company.' };
   return { role: role.id, pains, apps, appsOther: notZoho ? '' : clip(raw.appsOther, LIMIT.other),
     crms, crmOther: notZoho ? clip(raw.crmOther, LIMIT.other) : '', users, likert, polls, ...contact };
 }
@@ -118,9 +162,10 @@ export function band(score) {
 
 // Scores clean answers: each area is the average of its items (0-100), the total is the average of the areas.
 export function score(a) {
+  const nz = isNotZoho(a);
   const items = [];
-  for (const s of STATEMENTS) items.push({ area: s.area, pts: (a.likert[s.id] - 1) * 25, fix: s.fix });
-  for (const p of POLLS) if (p.area) items.push({ area: p.area, pts: p.options[a.polls[p.id]][1], fix: p.fix });
+  for (const s of STATEMENTS) items.push({ area: s.area, pts: (a.likert[s.id] - 1) * 25, fix: worded('statements', s, nz).fix });
+  for (const p of POLLS) if (p.area) items.push({ area: p.area, pts: p.options[a.polls[p.id]][1], fix: worded('polls', p, nz).fix });
 
   const areas = Object.keys(AREAS).map(k => {
     const mine = items.filter(i => i.area === k);
@@ -138,27 +183,35 @@ export function score(a) {
   return { total, band: band(total), areas, fixes, priority, match: match(a) };
 }
 
-// Matches a practitioner from the pains picked, falling back to the role.
+// Matches a practitioner. Each pain picked is one vote; the "fix one thing" poll is a slightly
+// heavier vote, so it wins a tie with a single pain; the role breaks any remaining tie.
+// Without the poll vote, a sales lead who picked any pain could never get the Sales Workflow
+// Strategist, and only "Something else" could ever get the Data Specialist.
+const PRIORITY_MATCH = { data: 'data', pipeline: 'workflow', connected: 'analytics', automation: 'automation' };
 export function match(a) {
   const role = ROLES.find(r => r.id === a.role);
   const votes = {};
-  for (const id of a.pains) { const p = PAINS.find(x => x.id === id); votes[p.match] = (votes[p.match] || 0) + 1; }
-  votes[role.match] = (votes[role.match] || 0) + 0.5;
+  const vote = (k, n) => { votes[k] = (votes[k] || 0) + n; };
+  for (const id of a.pains) vote(PAINS.find(x => x.id === id).match, 1);
+  const pick = POLLS.find(p => p.id === 'priority').options[a.polls && a.polls.priority];
+  if (pick) vote(PRIORITY_MATCH[pick[1]], 1.1);
+  vote(role.match, 0.5);
   const best = Object.keys(votes).sort((x, y) => votes[y] - votes[x])[0];
-  return { id: best, ...PRACTITIONERS[best] };
+  return worded('practitioners', { id: best, ...PRACTITIONERS[best] }, isNotZoho(a));
 }
 
 // Plain-language summary of the answers, used in the report and the lead note.
 export function summary(a) {
   const role = ROLES.find(r => r.id === a.role);
+  const nz = isNotZoho(a);
   const rows = [
     ['Role', role.title],
-    ['Manual work piles up in', a.pains.map(id => PAINS.find(p => p.id === id).label).join(', ') || 'Not given'],
+    ['Manual work piles up in', a.pains.map(id => worded('pains', PAINS.find(p => p.id === id), nz).label).join(', ') || 'Not given'],
     ['Zoho apps', [...a.apps, a.appsOther].filter(Boolean).join(', ') || 'Not given'],
     ...(a.apps.includes(NOT_ZOHO) ? [['Uses today instead', [...a.crms, a.crmOther].filter(Boolean).join(', ') || 'Not given']] : []),
     ['People using the CRM', a.users || 'Not given']
   ];
   for (const p of POLLS) rows.push([p.q, p.options[a.polls[p.id]][0]]);
-  for (const s of STATEMENTS) rows.push([s.text, LIKERT_SCALE[a.likert[s.id] - 1]]);
+  for (const s of STATEMENTS) rows.push([worded('statements', s, nz).text, LIKERT_SCALE[a.likert[s.id] - 1]]);
   return rows;
 }

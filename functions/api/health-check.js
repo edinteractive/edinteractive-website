@@ -5,8 +5,12 @@
 //   SMTP_HOST  optional: smtppro.zoho.com (default, domain mailboxes), smtppro.zoho.ca for Canadian accounts
 //   NOTIFY_TO  optional: where new health checks are copied (defaults to SMTP_USER)
 // Without SMTP_USER and SMTP_PASS the visitor still gets the score and the PDF download; nothing is emailed.
+// Bot check (Cloudflare Turnstile): set TURNSTILE_SECRET (secret) here and the matching site key
+// in the turnstile-sitekey meta tag of health-check/index.html. Until both are set, the report is
+// never emailed to the address typed in (only the copy to NOTIFY_TO), so the form can't be used
+// to send mail to strangers from our domain. The visitor still gets the PDF download.
 // Every health check also becomes a Lead in Zoho CRM through the Web-to-Lead form below (no keys needed).
-import { clean, validEmail, score, summary } from '../../assets/js/hc-model.js';
+import { clean, validEmail, score, summary, auditLine } from '../../assets/js/hc-model.js';
 import { buildPdf } from '../../assets/js/hc-pdf.js';
 
 // From the Zoho CRM Web-to-Lead form's embed code (Setup > Developer Hub > Webforms). These values are public.
@@ -47,6 +51,18 @@ function mime({ from, to, replyTo, subject, html, pdf, pdfName }) {
   ].filter(l => l !== null).join('\r\n');
 }
 
+async function verified(env, token, ip) {
+  if (!env.TURNSTILE_SECRET || !token) return false;
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: String(token).slice(0, 2048), remoteip: ip || '' })
+    });
+    const out = await res.json();
+    return out.success === true;
+  } catch (err) { console.error('Turnstile', err); return false; }
+}
+
 // Posts the lead to Zoho CRM. Answers, score and fixes go in Description so they show on the Lead record.
 async function crmLead(a, r, emailed, site) {
   if (!WEB_TO_LEAD.xnQsjsdp) return false;
@@ -64,8 +80,11 @@ async function crmLead(a, r, emailed, site) {
   });
   const res = await fetch(WEB_TO_LEAD.url, { method: 'POST', body, redirect: 'manual' });
   const where = res.headers.get('Location') || '';
-  const text = (await res.text()).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  const detail = `Zoho CRM ${res.status} ${where} ${text}`.slice(0, 300);
+  // Zoho answers with an HTML thank-you page: drop its styles, scripts and comments, keep the words.
+  const text = (await res.text()).replace(/<(style|script)[\s\S]*?<\/\1>|<!--[\s\S]*?-->/gi, ' ')
+    .replace(/[^<>]*-->/g, ' ').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const ok = res.status < 400 && /submitted successfully/i.test(text);
+  const detail = ok ? `Zoho CRM: lead created (${res.status})` : `Zoho CRM ${res.status} ${where} ${text}`.slice(0, 300);
   console.log(detail);
   if (res.status >= 400) throw new Error(detail);
   return detail;
@@ -119,14 +138,23 @@ async function smtp(env, envelopeTo, message) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if ((request.headers.get('Content-Length') || 0) > 20000) return json({ error: 'Too large.' }, 413);
+  // Content-Length can be missing (chunked uploads), so the size is checked on the body itself.
+  if (Number(request.headers.get('Content-Length') || 0) > 20000) return json({ error: 'Too large.' }, 413);
   let raw;
-  try { raw = await request.json(); } catch { return json({ error: 'Bad request.' }, 400); }
+  try {
+    const body = await request.text();
+    if (body.length > 20000) return json({ error: 'Too large.' }, 413);
+    raw = JSON.parse(body);
+  } catch { return json({ error: 'Bad request.' }, 400); }
   if (raw && raw.website) return json({ ok: true, emailed: false }); // honeypot: bots fill the hidden field
 
   const a = clean(raw);
   if (a.error) return json({ error: a.error }, 422);
   if (!a.name || !validEmail(a.email)) return json({ error: 'Please add your name and a valid work email.' }, 422);
+
+  const human = await verified(env, raw.turnstile, request.headers.get('CF-Connecting-IP'));
+  // With Turnstile on, a failed check stops here: no lead, no email.
+  if (env.TURNSTILE_SECRET && !human) return json({ error: 'We could not verify the request. Please reload the page and try again.' }, 403);
 
   const r = score(a);
   const origin = new URL(request.url).origin;
@@ -148,10 +176,10 @@ export async function onRequestPost({ request, env }) {
   const prospectHtml = `<p>Hi ${esc(first)},</p>
 <p>Thanks for taking the CRM health check. Your score is <b>${r.total}/100</b>: ${esc(r.band)}</p>
 ${fixes ? `<p>The fixes that will pay off first:</p><ol>${fixes}</ol>` : ''}
-<p>Your full report is attached as a PDF. The next step is a free full audit: we check your real CRM and Books data through the API, read-only, and walk you through it in 30 minutes. <a href="${origin}/sample-report/">See a sample report</a>, then just reply to this email to book a time.</p>
+<p>Your full report is attached as a PDF. The next step is a free full audit. ${esc(auditLine(a))} <a href="${origin}/sample-report/">See a sample report</a>, then just reply to this email to book a time.</p>
 <p>ED Interactive Group<br>B2B different, better, smarter.</p>`;
 
-  try {
+  if (human) try {
     await smtp(env, [a.email], mime({
       from, to: addr(a.email, a.name), replyTo: addr(notify), subject: `Your CRM health check: ${r.total}/100`,
       html: prospectHtml, pdf, pdfName
