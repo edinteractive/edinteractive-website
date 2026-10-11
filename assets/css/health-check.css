@@ -79,6 +79,8 @@ a.hc-chip:hover{border-color:var(--ink)}
 
 .hc-nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .hc-nav .btn-primary{margin-left:auto}
+.hc-nav-end{justify-content:flex-end}.hc-nav-end .btn-primary{margin-left:0}
+@media (max-width:520px){.hc-nav-end .btn{flex:1 1 100%;justify-content:center}.hc-nav-end .btn-primary{order:-1}}
 .hc-nav .btn:disabled{opacity:.6;cursor:progress}
 .hc-warn{color:var(--warn)}
 .hc-fine{font:400 12px/1.4 var(--mono);color:var(--muted)}

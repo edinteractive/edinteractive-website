@@ -15,8 +15,8 @@
 <link rel="preload" href="/assets/fonts/familjen-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
-<link rel="stylesheet" href="/assets/css/health-check.css">
-<script type="module" src="/assets/js/health-check.js"></script>
+<link rel="stylesheet" href="/assets/css/health-check.css?v=3">
+<script type="module" src="/assets/js/health-check.js?v=3"></script>
 </head>
 <body>
 <header>
@@ -117,8 +117,9 @@
         <p class="eyebrow">Your match</p>
         <div class="hc-match" id="hc-match-2"></div>
         <p class="hc-sent" id="hc-sent" aria-live="polite"></p>
-        <div class="hc-nav">
-          <button class="btn btn-primary" type="button" id="hc-pdf">Download the PDF</button>
+        <div class="hc-nav hc-nav-end">
+          <button class="btn btn-ghost" type="button" id="hc-pdf">Download the PDF</button>
+          <a class="btn btn-primary" id="hc-book" href="https://bookings.edinteractive.digital" target="_blank" rel="noopener">Book a consult →</a>
         </div>
         <p class="eyebrow">See a sample full-audit report for your industry</p>
         <div class="hc-chips">
