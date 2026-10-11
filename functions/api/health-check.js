@@ -165,7 +165,7 @@ export async function onRequestPost({ request, env }) {
 
   const r = score(a);
   const origin = new URL(request.url).origin;
-  const pdf = buildPdf(a, r, new Date(), new URL(request.url).host);
+  const pdf = buildPdf(a, r, new Date(), new URL(request.url).host, summary(a));
   const site = new URL(request.url).host;
   const lead = () => crmLead(a, r, emailed, site).catch(err => { console.error(err); return 'error: ' + String(err.message || err).slice(0, 300); });
   let emailed = false;

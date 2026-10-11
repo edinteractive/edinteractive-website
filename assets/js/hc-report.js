@@ -1,7 +1,8 @@
 // Builds the CRM health check report as a PDF (Uint8Array) with no dependencies,
 // so the same code runs in the browser (download) and in the Pages Function (email).
 // Uses the built-in Helvetica fonts, which only cover Latin-1 text.
-import { summary, isNotZoho } from './hc-core.js';
+// No imports: the caller passes the answer rows (summary() from hc-core.js), so the page can load
+// this file under a versioned URL without pulling in a second, possibly stale, copy of hc-core.js.
 
 // Report wording by language (the answers and fixes arrive already worded by hc-core.js).
 const WORDS = {
@@ -82,7 +83,7 @@ function wrap(str, size, bold, max) {
 const rgb = c => c.map(v => v.toFixed(3)).join(' ');
 
 // site is the host shown in the report, e.g. edinteractive.digital.
-export function buildPdf(a, r, date, site = 'edinteractive.digital') {
+export function buildPdf(a, r, date, site = 'edinteractive.digital', rows = []) {
   const t = WORDS[a.lang === 'fr' ? 'fr' : 'en'];
   const pages = [];
   let ops, y;
@@ -157,7 +158,7 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   // Answers.
   heading(t.answers);
   const colQ = 300, colA = W - 2 * M - colQ - 20;
-  for (const [q, ans] of summary(a)) {
+  for (const [q, ans] of rows) {
     const ql = wrap(q, 9.5, false, colQ), al = wrap(ans, 9.5, true, colA);
     const h = Math.max(ql.length, al.length) * 13 + 6;
     need(h);
@@ -168,7 +169,8 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   }
 
   // Next step.
-  const next = (isNotZoho(a) ? t.nextNz : t.nextZoho) + t.nextEnd(site, t.sample);
+  const nz = Array.isArray(a.apps) && a.apps.includes('Not on Zoho yet');
+  const next = (nz ? t.nextNz : t.nextZoho) + t.nextEnd(site, t.sample);
   const nl = wrap(next, 10.5, false, W - 2 * M - 36);
   const boxH = 46 + nl.length * 15;
   need(boxH + 30);

@@ -1,7 +1,7 @@
 // CRM health check: five short steps, an instant score on screen, and a PDF report.
 // The report function (/api/health-check) emails the same PDF and records the lead.
-import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, POLLS, clean, validEmail, score, match, worded, auditLine, langOf, label, likert } from './hc-core.js';
-import { buildPdf } from './hc-report.js';
+import { ROLES, PAINS, MAX_PAINS, APPS, NOT_ZOHO, OTHER_CRMS, CRM_USERS, STATEMENTS, POLLS, clean, validEmail, score, match, worded, auditLine, langOf, label, likert, summary } from './hc-core.js?v=3';
+import { buildPdf } from './hc-report.js?v=3';
 
 const $ = id => document.getElementById(id);
 // The page's own language (<html lang="fr-CA"> on /fr/bilan-crm/) picks the wording.
@@ -267,7 +267,7 @@ async function finish() {
   next.disabled = true; next.textContent = UI.building;
 
   const result = score(a);
-  pdfBytes = buildPdf(a, result, new Date(), location.host);
+  pdfBytes = buildPdf(a, result, new Date(), location.host, summary(a));
   const slug = (a.company || a.name).normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
   pdfName = slug ? UI.pdf + '-' + slug + '.pdf' : UI.pdf + '.pdf';
   renderResult(a, result);

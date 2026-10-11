@@ -15,10 +15,11 @@
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
   Access-Control-Allow-Origin: *
 
-# Scripts and styles change with each deploy and the scripts import each other, so a stale copy
-# mixed with a fresh one breaks the page: always revalidate (cheap, Pages answers 304 via ETag).
+# Scripts change with each deploy and import each other, so a stale copy mixed with a fresh one
+# leaves the health check empty. Safari has been seen reusing old module copies despite
+# must-revalidate, so scripts are never stored (they are small; styles still revalidate).
 /assets/js/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /assets/css/*
   Cache-Control: public, max-age=0, must-revalidate
 
