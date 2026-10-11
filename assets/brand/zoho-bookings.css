@@ -25,3 +25,14 @@ li.open > .zb-ct-time {
 .zcb-drop-down-search .zcb-element .text-ellipsis { white-space: normal !important; text-overflow: clip !important; height: auto !important; line-height: 1.35; }
 .zcb-drop-down-search .zcb-element .field-center,
 .zcb-drop-down-search .zcb-element .flex-column { height: auto !important; }
+
+/* Booking form: each question in its own card with a bold label, so questions don't blend together. */
+.bookings-field-theme > .label-container { background: #FFFFFF !important; border: 1px solid #E7E5DF !important; border-radius: 10px !important; padding: 14px 16px 16px !important; box-shadow: 0 1px 2px rgba(20,21,24,.04); position: relative !important; }
+.booking-info-container form .bookings-field-theme > .label-container.label-no-line { margin: 0 0 12px !important; }
+.bookings-field-theme > .label-container:focus-within { border-color: #FFC21A !important; box-shadow: 0 0 0 3px rgba(255,194,26,.25) !important; }
+.bookings-field-theme > .label-container > div:first-child { font-weight: 600 !important; color: #141518 !important; font-size: 15px !important; margin-bottom: 8px !important; }
+.bookings-field-theme > .label-container .input-box input,
+.bookings-field-theme > .label-container .input-box textarea { background: #FAF8F3 !important; }
+/* Email "Verify" link: inside the email box instead of hanging outside the card. */
+.label-container .zb-otp-verify-btn-inline { left: -58px !important; right: auto !important; top: 45px !important; font-weight: 600; }
+.label-container:has(.zb-otp-verify-btn-inline) input { padding-right: 66px !important; text-overflow: ellipsis; }
