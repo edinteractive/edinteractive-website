@@ -148,7 +148,7 @@ export function buildPdf(a, r, date, site = 'edinteractive.digital') {
   }
 
   // Next step.
-  const next = (isNotZoho(a) ? 'We review an export of your current CRM and accounting data, map what moving to Zoho would fix,' : 'We check your real CRM and Books data through the API, read-only,') + ' and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute walkthrough, reply to our email.';
+  const next = (isNotZoho(a) ? 'We review an export of your current CRM and accounting data, map what moving to Zoho would fix,' : 'We check your real CRM and Books data through the API, read-only,') + ' and send a ranked fix list with the revenue each fix is worth. See a sample report at ' + site + '/sample-report/. To book your free 30-minute Zoho & AI strategy call, reply to our email.';
   const nl = wrap(next, 10.5, false, W - 2 * M - 36);
   const boxH = 46 + nl.length * 15;
   need(boxH + 30);
