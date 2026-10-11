@@ -15,10 +15,23 @@ let pdfName = 'crm-health-check.pdf';
 // Cloudflare Turnstile bot check, loaded only when the contact step opens.
 const siteKey = (document.querySelector('meta[name=turnstile-sitekey]') || {}).content || '';
 let tsWidget = null;
+let tsFailed = false;
 function loadTurnstile() {
   if (!siteKey || tsWidget !== null || document.getElementById('hc-ts-js')) return;
   window.hcTurnstileReady = () => {
-    tsWidget = window.turnstile.render('#hc-ts', { sitekey: siteKey, action: 'health-check', size: 'flexible' });
+    tsWidget = window.turnstile.render('#hc-ts', {
+      sitekey: siteKey, action: 'health-check', size: 'flexible', 'retry-interval': 4000,
+      callback: () => { if (!warn.hidden) warn.hidden = true; },
+      // A failed check (some VPNs, privacy extensions, automated browsers) shouldn't leave the visitor guessing.
+      'error-callback': code => {
+        tsFailed = true;
+        warn.textContent = "Our security check couldn't verify this browser. Try again, turn off a VPN or ad blocker, or email david@edinteractive.digital and we'll run the health check with you.";
+        warn.hidden = false;
+        console.warn('Turnstile error', code);
+        return true; // handled: no uncaught error in the console
+      },
+      'expired-callback': () => window.turnstile.reset(tsWidget)
+    });
   };
   const js = document.createElement('script');
   js.id = 'hc-ts-js';
@@ -200,7 +213,12 @@ async function finish() {
   const a = clean(raw);
   if (a.error) { warn.textContent = a.error; warn.hidden = false; return; }
   raw.turnstile = tsToken();
-  if (siteKey && !raw.turnstile) { warn.textContent = 'One moment: the security check is still running. Try again in a few seconds.'; warn.hidden = false; return; }
+  if (siteKey && !raw.turnstile) {
+    if (tsFailed && window.turnstile) { tsFailed = false; window.turnstile.reset(tsWidget); }
+    warn.textContent = 'One moment: the security check is still running. Try again in a few seconds.';
+    warn.hidden = false;
+    return;
+  }
   const next = $('hc-next');
   next.disabled = true; next.textContent = 'Building your report…';
 
