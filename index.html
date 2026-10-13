@@ -20,11 +20,12 @@
 <link rel="icon" href="/favicon.ico?v=2" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png?v=2">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon-180x180.png?v=2">
-<link rel="preload" href="/assets/fonts/familjen-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/site.css?v=8">
+<link rel="preload" href="/assets/fonts/inter-display-600.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-400.woff" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=9">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"ED Interactive Group","url":"https://edinteractive.digital/","slogan":"B2B different, better, smarter","telephone":"+1-514-705-3744","areaServed":"CA","sameAs":["https://edinteractivegroup.com/"]}</script>
 <script src="/assets/js/site.js?v=2" defer></script>
+<script src="/assets/js/fx.js?v=1" defer></script>
 </head>
 <body>
 <header>
@@ -44,15 +45,17 @@
 </header>
 
 <main id="top">
+  <div class="hero-band">
   <div class="wrap hero">
     <div>
-      <p class="eyebrow">AI automation agency · Digital strategy + growth · Montréal</p>
+      <p class="eyebrow pill">AI automation agency · Digital strategy + growth · Montréal</p>
       <h1 class="tagline"><span class="b2b">B2B</span><span>different<em>.</em></span><span>better<em class="b">.</em></span><span>smarter<em class="s">.</em></span></h1>
       <p class="lede">Duplicate contacts, stale deals, reports nobody trusts. We fix the data in your <strong>Zoho CRM</strong>, bring CRM, Creator and Books together in <strong>Zoho Analytics</strong>, and put AI to work on the workflows and outreach that close more business.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="/health-check/">Get a free CRM health check →</a>
         <a class="btn btn-ghost" href="#services">See what we do</a>
       </div>
+      <ul class="trust"><li>Read-only access</li><li>Score and fix list in a week</li></ul>
     </div>
 
     <aside class="panel" aria-label="Sample CRM health check">
@@ -67,10 +70,16 @@
       <p class="panel-foot">Illustrative example · read from CRM + Books via API, no changes made</p>
     </aside>
   </div>
+  <div class="wrap prompt-wrap">
+    <a class="prompt" href="/health-check/" aria-label="Start a free CRM health check"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/><path d="M4 4.5h3M5.5 3v3"/></svg><span class="prompt-text" aria-hidden="true"><span class="typed" data-phrases="How many duplicate contacts are in our CRM?|Which deals have gone quiet for 60 days?|Do our Books invoices match our CRM accounts?|Where is our Zoho data costing us deals?"></span><span class="caret"></span><span class="hint">← questions the health check answers</span></span><span class="btn btn-primary">Free health check<span class="long"> →</span></span></a>
+  </div>
+  </div>
 
   <div class="apps"><div class="wrap">
     <span>We work inside</span><span>Zoho CRM</span><span>Creator</span><span>Books</span><span>Analytics</span><span>Campaigns</span><span>SalesIQ</span><span>Flow</span>
   </div></div>
+
+  <div class="statement"><div class="wrap"><p>Clean data first. Then <b>one dashboard</b> for revenue, pipeline and margin, workflows without the manual steps, and <b>outreach that tells you what works</b>.</p></div></div>
 
   <section id="approach">
     <div class="wrap">
@@ -104,26 +113,27 @@
         <h2>Four services. One clean system.</h2>
         <p>Each one stands alone, but each makes the next one work better.</p>
       </div>
+      <nav class="svc-tabs" aria-label="Services"><a href="#svc-clean">Clean</a><a href="#svc-connect">Connect</a><a href="#svc-automate">Automate</a><a href="#svc-grow">Grow</a></nav>
       <div class="svc-grid">
-        <article class="svc">
+        <article class="svc" id="svc-clean">
           <span class="eyebrow">Clean</span>
           <h3>CRM data cleanup</h3>
           <p>Deduplicate, standardize and enrich contacts, accounts and deals. AI agents flag bad records and keep them clean after we leave.</p>
           <p class="out">You get <b>one record per customer</b>, complete fields, validation rules</p>
         </article>
-        <article class="svc">
+        <article class="svc" id="svc-connect">
           <span class="eyebrow">Connect</span>
           <h3>Data mining into Zoho Analytics</h3>
           <p>Join CRM, Creator and Books into a single model so revenue, pipeline and margin finally sit on one dashboard.</p>
           <p class="out">You get <b>live dashboards</b> for pipeline, revenue and customer value</p>
         </article>
-        <article class="svc">
+        <article class="svc" id="svc-automate">
           <span class="eyebrow">Automate</span>
           <h3>Workflow improvement</h3>
           <p>Map how work really moves, remove the manual steps, and add AI where judgment used to wait in someone's inbox.</p>
           <p class="out">You get <b>fewer hand-offs</b>, Deluge and Flow automations, AI assist</p>
         </article>
-        <article class="svc">
+        <article class="svc" id="svc-grow">
           <span class="eyebrow">Grow</span>
           <h3>Sales and marketing outreach</h3>
           <p>Segments built from clean data, sequences that respect each buyer's channel, and tests that tell you what works.</p>
