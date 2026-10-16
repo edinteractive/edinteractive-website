@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "description": "Run Pages Functions only for the API and the site root (the root is where buyer.edinteractive.digital is routed to the buyer persona builder); everything else is served as static files.",
+  "include": ["/api/*", "/"],
+  "exclude": []
+}
