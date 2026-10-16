@@ -1,5 +1,10 @@
 // /booked/: fills the summary card from the booking details Zoho Bookings appends to the URL.
 // Values are written with textContent only, and anything missing simply stays hidden.
+// When the booking was made in the widget embedded on /book/, Zoho opens this page inside that frame.
+// Reload it as the whole page instead (same origin, so this is allowed).
+if (window.top !== window.self) {
+  try { window.top.location.replace(location.href); } catch (e) { /* cross-origin parent: stay framed */ }
+}
 (() => {
   const q = new URLSearchParams(location.search);
   const lower = new Map();
@@ -11,6 +16,13 @@
     }
     return '';
   };
+
+  // The French booking page sends people here too (Zoho has one confirmation page per workspace):
+  // pass them, details and all, to the French thank-you page.
+  if (location.pathname === '/booked/' && /^Appel\b/i.test(pick('service_name', 'service'))) {
+    location.replace('/fr/reservation-confirmee/' + location.search);
+    return;
+  }
 
   const name = pick('customer_first_name', 'customer_name', 'name', 'first_name');
   const first = name.split(/\s+/)[0];

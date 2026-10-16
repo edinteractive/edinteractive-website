@@ -16,4 +16,12 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://edinteractive.digital/health-check/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/bilan-crm/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/health-check/"/></url>
+  <url><loc>https://edinteractive.digital/book/</loc><lastmod>2026-10-16</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://edinteractive.digital/book/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/reserver/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/book/"/></url>
+  <url><loc>https://edinteractive.digital/fr/reserver/</loc><lastmod>2026-10-16</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://edinteractive.digital/book/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://edinteractive.digital/fr/reserver/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://edinteractive.digital/book/"/></url>
 </urlset>
