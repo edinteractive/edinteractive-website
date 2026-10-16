@@ -49,3 +49,5 @@ li.open > .zb-ct-time {
 .zb-classic-box-header-inner:has(.zb-classic-web-view-date) .zb-classic-box-header-icon::before{content:"02"}
 .zb-classic-box-header-inner:has(.zb-classic-web-view-info) .zb-classic-box-header-icon::before{content:"03"}
 .zb-classic-web-view-service,.zb-classic-web-view-date,.zb-classic-web-view-info{font:500 12px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace!important;letter-spacing:.12em!important;text-transform:uppercase!important}
+/* French booking page (appel30min): the same hint in Quebec French. Zoho names the box after its label. */
+.bookings-field-theme > .label-container .input-box:has(textarea[name^="x_Quels"]:placeholder-shown)::before { content: "Précisez vos indicateurs de performance visés, p. ex. un RCI de 5 à 10 %+, une hausse de conversion de 5 à 10 %+, etc."; }
