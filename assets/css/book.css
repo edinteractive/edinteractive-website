@@ -1,0 +1,40 @@
+/* /book/ and /fr/reserver/: booking landing page with the Zoho Bookings widget embedded. */
+.bkg-hero{padding-block:clamp(48px,8vw,88px) clamp(32px,5vw,56px)}
+.bkg-hero h1{font-size:clamp(40px,6.4vw,76px);line-height:1;letter-spacing:-.04em;margin-top:14px;max-width:15ch}
+.bkg-hero h1 em{font-style:normal;color:var(--signal)}
+.bkg-hero .lede{font-size:clamp(18px,1.6vw,20px);color:var(--muted);margin-top:20px;max-width:56ch}
+.bkg-hero .cta-row{margin-top:28px}
+.bkg-facts{display:flex;flex-wrap:wrap;gap:8px 28px;margin:28px 0 0;padding:0;list-style:none;font:500 13px/1.4 var(--mono);color:var(--muted)}
+.bkg-facts b{color:var(--ink);font-weight:500}
+
+.bkg-sessions{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.bkg-session{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);padding:24px;display:grid;gap:12px;align-content:start;color:inherit;text-decoration:none;transition:border-color .15s}
+.bkg-session:hover,.bkg-session:focus-visible{border-color:var(--gold)}
+.bkg-session.paid{border-top:4px solid var(--gold)}
+.bkg-session img{width:56px;height:56px;border-radius:var(--radius-m)}
+.bkg-session h3{font-size:20px;line-height:1.2}
+.bkg-session p{color:var(--muted);margin:0}
+.bkg-tag{justify-self:start;font:500 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 8px;border-radius:var(--radius-s);background:var(--signal-soft);color:var(--signal)}
+.bkg-session.paid .bkg-tag{background:var(--gold);color:var(--on-gold)}
+.bkg-meta{font:500 13px/1.5 var(--mono);color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:auto}
+
+.bkg-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:0;padding:0;list-style:none;counter-reset:s}
+.bkg-steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);padding:22px;display:grid;gap:8px}
+.bkg-steps li::before{content:"0" counter(s);justify-self:start;font:600 14px/1 var(--mono);background:var(--gold);color:var(--on-gold);padding:8px;border-radius:var(--radius-s)}
+.bkg-steps b{font-size:18px}
+.bkg-steps span{color:var(--muted)}
+
+.bkg-embed{background:#3D3D3D;border-radius:var(--radius-m);overflow:hidden;border:1px solid var(--line)}
+.bkg-embed iframe{display:block;width:100%;height:1180px;border:0}
+.bkg-fallback{margin-top:14px;font-size:14px;color:var(--muted)}
+
+.bkg-faq{max-width:780px}
+.bkg-faq details{border-top:1px solid var(--line);padding:18px 0}
+.bkg-faq details:last-child{border-bottom:1px solid var(--line)}
+.bkg-faq summary{cursor:pointer;font-weight:600;font-size:18px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.bkg-faq summary::-webkit-details-marker{display:none}
+.bkg-faq summary::after{content:"+";font:500 20px/1 var(--mono);color:var(--signal)}
+.bkg-faq details[open] summary::after{content:"–"}
+.bkg-faq p{color:var(--muted);margin:10px 0 0;max-width:68ch}
+
+@media (max-width:900px){.bkg-sessions,.bkg-steps{grid-template-columns:1fr}.bkg-embed iframe{height:1400px}}
