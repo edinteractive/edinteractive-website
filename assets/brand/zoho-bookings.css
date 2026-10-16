@@ -40,3 +40,12 @@ li.open > .zb-ct-time {
 .bookings-field-theme > .label-container .input-box:has(textarea) { position: relative !important; }
 .bookings-field-theme > .label-container .input-box:has(textarea:placeholder-shown)::before { content: "Specify your ideal performance goal metrics, e.g. 5–10%+ ROI, 5–10%+ conversion lift, etc."; position: absolute; left: 12px; right: 12px; top: 10px; font-size: 13px; line-height: 1.45; color: #8A8D94; pointer-events: none; z-index: 2; }
 .bookings-field-theme > .label-container textarea::placeholder { color: transparent; }
+
+/* Step headers: numbered gold squares (01/02/03) instead of Zoho's line icons; matches the site's numbered .flow steps. */
+.zb-classic-box-header-icon{width:36px!important;height:36px!important;min-width:36px!important;border-radius:4px!important;border:0!important;background:#FFC21A!important;box-shadow:none!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.zb-classic-box-header-icon > *{display:none!important}
+.zb-classic-box-header-icon::before{position:static!important;display:block!important;font:600 15px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace;letter-spacing:.04em;color:#141518}
+.zb-classic-box-header-inner:has(.zb-classic-web-view-service) .zb-classic-box-header-icon::before{content:"01"}
+.zb-classic-box-header-inner:has(.zb-classic-web-view-date) .zb-classic-box-header-icon::before{content:"02"}
+.zb-classic-box-header-inner:has(.zb-classic-web-view-info) .zb-classic-box-header-icon::before{content:"03"}
+.zb-classic-web-view-service,.zb-classic-web-view-date,.zb-classic-web-view-info{font:500 12px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace!important;letter-spacing:.12em!important;text-transform:uppercase!important}
