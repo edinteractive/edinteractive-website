@@ -189,3 +189,4 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-bet
 .voices-note{margin-top:20px;font-size:15px;color:var(--muted)}
 .closer p a{color:var(--ink);font-weight:600;text-underline-offset:3px}
 #brain .sec-head,#handover .sec-head{margin-bottom:0}
+.svc p a,footer a{color:var(--ink);text-underline-offset:3px}
