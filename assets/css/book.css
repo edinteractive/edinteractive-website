@@ -38,3 +38,5 @@
 .bkg-faq p{color:var(--muted);margin:10px 0 0;max-width:68ch}
 
 @media (max-width:900px){.bkg-sessions,.bkg-steps{grid-template-columns:1fr}.bkg-embed iframe{height:1400px}}
+/* Way out of the booking section, under the embed. */
+.bkg-home{margin-top:20px;font-size:15px}.bkg-home a{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--line)}.bkg-home a:hover{text-decoration-color:var(--ink)}
