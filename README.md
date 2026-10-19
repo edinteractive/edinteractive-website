@@ -1,6 +1,6 @@
 # edinteractivegroup.com
 
-> Live on **edinteractive.digital** first. Canonicals, og tags, `sitemap.xml` and `robots.txt` use edinteractive.digital until the edinteractivegroup.com cutover; at cutover, find-and-replace the domain in those files (and the `sameAs` in the homepage JSON-LD), plus add a 301 from edinteractive.digital.
+> Lives on **edinteractive.digital**, the AI-led Zoho One brand. edinteractivegroup.com stays separate as the strategy practice; the homepage links to it (Map service, footer, JSON-LD `sameAs`). No domain cutover is planned.
 
 Static site for ED Interactive Group, hosted on Cloudflare Pages.
 
