@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Free buyer persona builder | ED Interactive Group</title>
+<meta name="description" content="Build a one-page buyer persona in about 10 minutes: goals, pain points, buying triggers, decision criteria and where to reach them. Free, from ED Interactive Group.">
+<link rel="canonical" href="https://edinteractive.digital/buyer-persona/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free buyer persona builder | ED Interactive Group">
+<meta property="og:description" content="Tell us who your best customer is and get a one-page buyer persona you can download and share with your team.">
+<meta property="og:url" content="https://edinteractive.digital/buyer-persona/">
+<meta property="og:image" content="https://edinteractive.digital/assets/img/og.png">
+<!-- Cloudflare Turnstile site key (public), same widget as the health check. Secret: TURNSTILE_SECRET in Pages. -->
+<meta name="turnstile-sitekey" content="0x4AAAAAAFTg4JlPA7Wq3ATB">
+<meta name="theme-color" content="#141518">
+<link rel="icon" href="/favicon.ico?v=2" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png?v=2">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon-180x180.png?v=2">
+<link rel="preload" href="/assets/fonts/familjen-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=8">
+<link rel="stylesheet" href="/assets/css/persona.css?v=1">
+<script src="/assets/js/persona.js?v=1" defer></script>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="https://edinteractive.digital/" aria-label="ED Interactive home"><span class="mark" role="img" aria-label="ed monogram"></span>ED Interactive</a>
+    <ul>
+      <li><a href="https://edinteractive.digital/#approach">Approach</a></li>
+      <li><a href="https://edinteractive.digital/#services">Services</a></li>
+      <li><a href="https://edinteractive.digital/#process">How we work</a></li>
+      <li><a href="https://edinteractive.digital/#why">Why ED</a></li>
+      <li><a href="https://edinteractive.digital/#voices">Clients</a></li>
+    </ul>
+    <a class="btn btn-ghost nav-consult" href="https://bookings.edinteractive.digital/meetwithed30min" target="_blank" rel="noopener">Book a consult</a>
+    <a class="btn btn-primary" href="https://edinteractive.digital/health-check/">Free CRM health check →</a>
+  </div>
+</header>
+
+<main class="bp" id="top">
+  <section class="bp-intro" id="intro">
+    <p class="eyebrow">Free buyer persona builder · 10 minutes</p>
+    <h1>Tell us who your best customer is.</h1>
+    <p class="lede">Answer what you know about one ideal buyer. At the end you get a one-page persona you can save as a PDF and share with your team, and a copy goes to ED Interactive so we can help you plan marketing and sales around it. Your answers save in this browser as you go.</p>
+    <div class="bp-rings" role="group" aria-label="What the persona covers">
+      <div class="bp-ring"><b>Priority initiatives</b><small>What makes them start looking</small></div>
+      <div class="bp-ring"><b>Success factors</b><small>What a win looks like to them</small></div>
+      <div class="bp-ring"><b>Perceived barriers</b><small>What makes them hesitate</small></div>
+      <div class="bp-ring"><b>Buyer’s journey</b><small>Who’s involved and how they decide</small></div>
+      <div class="bp-ring"><b>Decision criteria</b><small>How they compare options</small></div>
+    </div>
+    <div class="bp-row">
+      <button class="btn btn-primary" id="start" type="button">Start the questionnaire →</button>
+      <button class="btn btn-ghost" id="example" type="button">See an example persona</button>
+    </div>
+    <p class="saved" id="saved" aria-live="polite"></p>
+  </section>
+
+  <div id="app" hidden>
+    <nav class="bp-rail" aria-label="Questionnaire steps">
+      <div class="bp-steps" id="steps"></div>
+      <div class="bp-bar"><i id="bar"></i></div>
+    </nav>
+    <form id="form" class="bp-panel" novalidate><button type="submit" hidden>Continue</button></form>
+  </div>
+
+  <div id="result" hidden></div>
+</main>
+<div class="bp-toast" id="toast" hidden role="status"></div>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="https://edinteractive.digital/"><span class="mark" aria-hidden="true"></span>ED Interactive Group</a>
+    <span>B2B different, better, smarter.</span>
+    <span>© 2026 ED Interactive Group</span>
+  </div>
+</footer>
+</body>
+</html>
